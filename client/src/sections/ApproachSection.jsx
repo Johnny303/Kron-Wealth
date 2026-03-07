@@ -30,6 +30,7 @@ export default function ApproachSection() {
   const [hoveredIndex, setHoveredIndex] = useState(null)
   const [showText, setShowText] = useState(false)
   const [hasEntered, setHasEntered] = useState(false)
+  const [revealedCards, setRevealedCards] = useState([false, false, false, false])
 
   // Refs for dynamic SVG lines
   const containerRef = useRef(null)
@@ -95,6 +96,17 @@ export default function ApproachSection() {
     }
   }, [hoveredIndex])
 
+  // Reveal cards sequentially as the glow line reaches each dot
+  useEffect(() => {
+    if (!hasEntered) return
+    const timers = steps.map((_, i) =>
+      setTimeout(() => {
+        setRevealedCards(prev => { const next = [...prev]; next[i] = true; return next })
+      }, i * 900)
+    )
+    return () => timers.forEach(clearTimeout)
+  }, [hasEntered])
+
   return (
     <section id="approach" className="scroll-mt-16">
       {/* Header */}
@@ -126,6 +138,17 @@ export default function ApproachSection() {
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
+                  {/* Soft shadow filter to make lines feel recessed/inset */}
+                  <filter id="line-shadow" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="shadow" />
+                    <feOffset dx="0" dy="1" result="offsetShadow" />
+                    <feFlood floodColor="#000" floodOpacity="0.3" result="color" />
+                    <feComposite in="color" in2="offsetShadow" operator="in" result="coloredShadow" />
+                    <feMerge>
+                      <feMergeNode in="coloredShadow" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
                 </defs>
                 {lineCoords.map((c, idx) => {
                   const dx = c.x2 - c.x1
@@ -136,13 +159,14 @@ export default function ApproachSection() {
                   const fadeDelay = segDelay + 900
                   return (
                     <g key={idx}>
-                      {/* Base line — dim until entrance animation */}
+                      {/* Base line — recessed behind cards */}
                       <line
                         x1={c.x1} y1={c.y1}
                         x2={c.x2} y2={c.y2}
-                        stroke="#B97A45"
+                        stroke="#8A5A2A"
                         strokeWidth="2"
-                        opacity={hasEntered ? 1 : 0.3}
+                        opacity={hasEntered ? 0.5 : 0.15}
+                        filter="url(#line-shadow)"
                         style={{ transition: 'opacity 900ms' }}
                       />
                       {/* Bright glow line — draws itself on entrance, then fades out */}
@@ -185,18 +209,23 @@ export default function ApproachSection() {
                   const isTopRow = i % 2 === 0
                   const isHovered = hoveredIndex === i
                   const anyHovered = hoveredIndex !== null
+                  const isRevealed = revealedCards[i]
 
                   return (
                     <motion.div
                       key={step.title}
                       variants={staggerItem}
-                      className={`relative flex-1 transition-opacity duration-300 ${
+                      className={`relative flex-1 transition-all duration-500 ${
                         !isTopRow ? 'mt-[80px]' : ''
                       } ${anyHovered && !isHovered ? 'opacity-50' : 'opacity-100'}`}
+                      style={{
+                        filter: isRevealed ? 'blur(0px)' : 'blur(6px)',
+                        transition: 'filter 600ms ease-out, opacity 300ms',
+                      }}
                       onMouseEnter={() => setHoveredIndex(i)}
                       onMouseLeave={() => setHoveredIndex(null)}
                     >
-                      {/* Card */}
+                      {/* Card — elevated above the connector lines */}
                       <div
                         className={`relative w-full backdrop-blur-sm border rounded-xl cursor-default
                           transition-all pt-6 px-6 ${
@@ -204,10 +233,13 @@ export default function ApproachSection() {
                               ? 'bg-kron-gold border-kron-gold pb-16'
                               : 'bg-white/10 border-white/20 pb-6'
                           }`}
-                        style={{ transitionDuration: isHovered ? '1500ms' : '300ms' }}
+                        style={{
+                          transitionDuration: isHovered ? '1500ms' : '300ms',
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
+                        }}
                       >
                         <h3
-                          className={`font-bold text-white text-center mb-2 transition-all whitespace-nowrap ${
+                          className={`font-medium text-white text-center mb-2 transition-all whitespace-nowrap ${
                             isHovered ? 'text-2xl' : 'text-lg'
                           }`}
                           style={{ transitionDuration: isHovered ? '1500ms' : '300ms' }}
