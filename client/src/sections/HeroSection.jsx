@@ -83,7 +83,7 @@ export default function HeroSection() {
           </motion.h1>
 
           <motion.p
-            className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto lg:mx-0 leading-relaxed"
+            className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto lg:mx-0 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
@@ -100,13 +100,13 @@ export default function HeroSection() {
           >
             <a
               href="#about"
-              className="inline-block px-8 py-4 bg-kron-gold text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              className="inline-block px-8 py-4 bg-kron-gold text-white font-sans font-normal rounded-lg hover:opacity-90 transition-opacity"
             >
               Learn About Us
             </a>
             <a
               href="#contact"
-              className="inline-block px-8 py-4 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/5 transition-colors"
+              className="inline-block px-8 py-4 border border-white/20 text-white font-sans font-normal rounded-lg hover:bg-white/5 transition-colors"
             >
               Get in Touch
             </a>
