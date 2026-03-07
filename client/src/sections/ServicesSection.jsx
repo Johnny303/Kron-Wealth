@@ -56,12 +56,12 @@ export default function ServicesSection() {
   return (
     <section id="services" className="scroll-mt-16">
       {/* Header + Intro */}
-      <div className="py-24 px-6">
+      <div className="bg-kron-green py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <FadeInUp>
             <div className="text-center mb-6">
-              <h2 className="font-display text-7xl md:text-8xl font-medium text-kron-green mb-4">Our Services</h2>
-              <p className="text-lg text-kron-brown">
+              <h2 className="font-display text-7xl md:text-8xl font-medium text-white mb-4">Our Services</h2>
+              <p className="text-lg text-white/70">
                 Comprehensive financial services tailored to your needs
               </p>
             </div>
@@ -69,7 +69,7 @@ export default function ServicesSection() {
 
           <FadeInUp delay={0.1}>
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <p className="text-lg text-kron-brown leading-relaxed">
+              <p className="text-lg text-white/70 leading-relaxed">
                 We offer a full range of financial planning services designed to help you achieve
                 your goals. Every recommendation is personal to you and based on a thorough
                 understanding of your circumstances.
