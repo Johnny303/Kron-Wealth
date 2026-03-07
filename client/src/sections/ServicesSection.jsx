@@ -60,8 +60,8 @@ export default function ServicesSection() {
         <div className="max-w-6xl mx-auto">
           <FadeInUp>
             <div className="text-center mb-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mb-4">Our Services</h2>
-              <p className="text-lg text-navy-lighter">
+              <h2 className="font-display text-7xl md:text-8xl font-medium text-kron-green mb-4">Our Services</h2>
+              <p className="text-lg text-kron-brown">
                 Comprehensive financial services tailored to your needs
               </p>
             </div>
@@ -69,7 +69,7 @@ export default function ServicesSection() {
 
           <FadeInUp delay={0.1}>
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <p className="text-lg text-navy-lighter leading-relaxed">
+              <p className="text-lg text-kron-brown leading-relaxed">
                 We offer a full range of financial planning services designed to help you achieve
                 your goals. Every recommendation is personal to you and based on a thorough
                 understanding of your circumstances.
@@ -90,15 +90,15 @@ export default function ServicesSection() {
                   y: -4,
                   transition: { duration: 0.2 },
                 }}
-                className="group rounded-2xl border border-slate-100 p-8 hover:shadow-lg hover:border-emerald/20 transition-all bg-white"
+                className="group rounded-2xl border border-kron-sage/30 p-8 hover:shadow-lg hover:border-kron-gold/20 transition-all bg-white"
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald/10 flex items-center justify-center mb-6 group-hover:bg-emerald/20 transition-colors">
-                  <svg className="w-6 h-6 text-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 rounded-xl bg-kron-gold/10 flex items-center justify-center mb-6 group-hover:bg-kron-gold/20 transition-colors">
+                  <svg className="w-6 h-6 text-kron-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {service.icon}
                   </svg>
                 </div>
-                <h3 className="text-lg font-bold text-navy mb-3">{service.title}</h3>
-                <p className="text-sm text-navy-lighter leading-relaxed">
+                <h3 className="text-lg font-bold text-kron-green mb-3">{service.title}</h3>
+                <p className="text-sm text-kron-brown leading-relaxed">
                   {service.description}
                 </p>
               </motion.div>
@@ -108,15 +108,15 @@ export default function ServicesSection() {
       </div>
 
       {/* CTA */}
-      <div className="bg-slate-50 py-24 px-6">
+      <div id="goals" className="bg-kron-mist py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <FadeInUp>
-            <h3 className="text-3xl font-bold text-navy mb-6">
+            <h3 className="text-3xl font-bold text-kron-green mb-6">
               Let&apos;s Talk About Your Goals
             </h3>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-lg text-navy-lighter leading-relaxed mb-10">
+            <p className="text-lg text-kron-brown leading-relaxed mb-10">
               Ready to take the next step? Get in touch and we&apos;ll arrange a
               complimentary initial consultation to discuss how we can help.
             </p>
@@ -124,7 +124,7 @@ export default function ServicesSection() {
           <FadeInUp delay={0.2}>
             <a
               href="#contact"
-              className="inline-block px-8 py-4 bg-gradient-to-r from-emerald to-emerald-dark text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              className="inline-block px-8 py-4 bg-kron-gold text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
             >
               Get in Touch
             </a>

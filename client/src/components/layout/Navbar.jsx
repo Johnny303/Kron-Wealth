@@ -94,7 +94,7 @@ export default function Navbar() {
 
   const bgClass = isHome && !scrolled
     ? 'bg-transparent'
-    : 'bg-navy/95 backdrop-blur-sm border-b border-white/10'
+    : 'bg-kron-green/95 backdrop-blur-sm border-b border-white/10'
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${bgClass}`}>
@@ -103,13 +103,21 @@ export default function Navbar() {
           <a
             href="#hero"
             onClick={(e) => handleNavClick(e, '#hero')}
-            className="text-xl font-bold tracking-wider text-white"
+            className="block"
           >
-            KRON<span className="text-gold">.</span>
+            <img
+              src="/images/kron-signature.png"
+              alt="Kron Wealth"
+              className="h-15 w-auto brightness-[1.8]"
+            />
           </a>
         ) : (
-          <Link to="/" className="text-xl font-bold tracking-wider text-white">
-            KRON<span className="text-gold">.</span>
+          <Link to="/" className="block">
+            <img
+              src="/images/kron-signature.png"
+              alt="Kron Wealth"
+              className="h-15 w-auto brightness-[1.8]"
+            />
           </Link>
         )}
 
@@ -120,9 +128,9 @@ export default function Navbar() {
               key={href}
               href={href}
               onClick={(e) => handleNavClick(e, href)}
-              className={`text-sm font-medium transition-colors ${
+              className={`text-[1.225rem] font-medium transition-colors ${
                 isHome && activeSection === href
-                  ? 'text-gold'
+                  ? 'text-kron-gold'
                   : 'text-white/80 hover:text-white'
               }`}
             >
@@ -149,16 +157,16 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-navy border-t border-white/10">
+        <div className="md:hidden bg-kron-green border-t border-white/10">
           <div className="px-6 py-4 flex flex-col gap-4">
             {sectionLinks.map(({ href, label }) => (
               <a
                 key={href}
                 href={href}
                 onClick={(e) => handleNavClick(e, href)}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-[1.225rem] font-medium transition-colors ${
                   isHome && activeSection === href
-                    ? 'text-gold'
+                    ? 'text-kron-gold'
                     : 'text-white/80 hover:text-white'
                 }`}
               >

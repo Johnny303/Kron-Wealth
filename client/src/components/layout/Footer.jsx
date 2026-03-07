@@ -2,14 +2,16 @@ import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="bg-navy text-white/70">
+    <footer className="bg-kron-green text-white/70">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-3 gap-12">
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-bold text-white tracking-wider mb-4">
-              KRON<span className="text-gold">.</span>
-            </h3>
+            <img
+              src="/images/kron-logo-full.png"
+              alt="Kron Wealth"
+              className="h-16 w-auto brightness-[1.8] mb-4"
+            />
             <p className="text-sm leading-relaxed">
               Strategic Financial Consultancy and Wealth Management. Helping you
               make the most of your time and money.

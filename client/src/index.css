@@ -1,14 +1,21 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'RetroSignature';
+  src: url('/fonts/RetroSignature.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --color-navy: #0F172A;
-  --color-navy-light: #1E293B;
-  --color-navy-lighter: #334155;
-  --color-emerald: #10B981;
-  --color-emerald-dark: #059669;
-  --color-gold: #D4A843;
-  --color-gold-light: #E5C76B;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-kron-green: #10312C;
+  --color-kron-gold: #B97A45;
+  --color-kron-sage: #C1CCC5;
+  --color-kron-mist: #ECF3F4;
+  --color-kron-brown: #3F3025;
+  --font-sans: 'Georgia', serif;
+  --font-display: 'RetroSignature', cursive;
 }
 
 @layer base {
@@ -22,7 +29,7 @@
 
   body {
     font-family: var(--font-sans);
-    color: #1E293B;
+    color: #3F3025;
     background-color: #ffffff;
     margin: 0;
   }
