@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0F172A;
+  --color-navy-light: #1E293B;
+  --color-navy-lighter: #334155;
+  --color-emerald: #10B981;
+  --color-emerald-dark: #059669;
+  --color-gold: #D4A843;
+  --color-gold-light: #E5C76B;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #1E293B;
+    background-color: #ffffff;
+    margin: 0;
+  }
+
+  [id] {
+    scroll-margin-top: 4rem;
+  }
+}
