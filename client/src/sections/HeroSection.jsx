@@ -50,16 +50,8 @@ export default function HeroSection() {
           className="text-center lg:text-left order-2 flex flex-col justify-center gap-8 px-6 lg:px-16 py-12 lg:py-0"
           style={{ y: textY, opacity: textOpacity }}
         >
-          <motion.span
-            className="font-display text-5xl md:text-7xl lg:text-8xl text-kron-gold"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            Krone Wealth
-          </motion.span>
           <motion.h1
-            className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"
+            className="text-4xl md:text-6xl lg:text-7xl font-normal text-white leading-tight"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
