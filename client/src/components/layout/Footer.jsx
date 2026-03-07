@@ -8,7 +8,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <img
-              src="/images/kron-logo-full.png"
+              src={`${import.meta.env.BASE_URL}images/kron-logo-full.png`}
               alt="Kron Wealth"
               className="h-16 w-auto brightness-[1.8] mb-4"
             />

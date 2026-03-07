@@ -106,7 +106,7 @@ export default function Navbar() {
             className="block"
           >
             <img
-              src="/images/kron-signature.png"
+              src={`${import.meta.env.BASE_URL}images/kron-signature.png`}
               alt="Kron Wealth"
               className="h-15 w-auto brightness-[1.8]"
             />
@@ -114,7 +114,7 @@ export default function Navbar() {
         ) : (
           <Link to="/" className="block">
             <img
-              src="/images/kron-signature.png"
+              src={`${import.meta.env.BASE_URL}images/kron-signature.png`}
               alt="Kron Wealth"
               className="h-15 w-auto brightness-[1.8]"
             />
