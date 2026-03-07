@@ -17,7 +17,7 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={sectionRef}
-      className="relative min-h-screen bg-kron-green overflow-hidden"
+      className="relative h-screen bg-kron-green overflow-hidden"
     >
       {/* Parallax background accents */}
       <motion.div
@@ -26,7 +26,7 @@ export default function HeroSection() {
       />
 
       {/* Full-width grid layout */}
-      <div className="relative z-10 w-full min-h-screen grid grid-cols-1 lg:grid-cols-[1fr_2fr]">
+      <div className="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_2fr]">
         {/* Left: Animated Hourglass — full height, edge-to-edge */}
         <motion.div
           className="relative overflow-hidden h-[50vh] lg:h-auto order-1"
@@ -50,6 +50,14 @@ export default function HeroSection() {
           className="text-center lg:text-left order-2 flex flex-col justify-center gap-8 px-6 lg:px-16 py-12 lg:py-0"
           style={{ y: textY, opacity: textOpacity }}
         >
+          <motion.span
+            className="font-display text-5xl md:text-7xl lg:text-8xl text-kron-gold"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Krone Wealth
+          </motion.span>
           <motion.h1
             className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"
             initial={{ opacity: 0, y: 30 }}
