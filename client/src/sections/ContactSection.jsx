@@ -3,36 +3,23 @@ import { FadeInUp, SlideInLeft, SlideInRight } from '../components/ScrollAnimati
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
-  const [status, setStatus] = useState('idle') // idle | sending | success | error
-  const [errorMsg, setErrorMsg] = useState('')
+  const [status, setStatus] = useState('idle') // idle | sending | success
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setStatus('sending')
-    setErrorMsg('')
 
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
+    const subject = encodeURIComponent(`Contact from ${form.name}`)
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\n\n${form.message}`
+    )
+    window.location.href = `mailto:Hello@kron.uk?subject=${subject}&body=${body}`
 
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Something went wrong')
-      }
-
-      setStatus('success')
-      setForm({ name: '', email: '', phone: '', message: '' })
-    } catch (err) {
-      setStatus('error')
-      setErrorMsg(err.message)
-    }
+    setStatus('success')
+    setForm({ name: '', email: '', phone: '', message: '' })
   }
 
   return (
@@ -177,11 +164,6 @@ export default function ContactSection() {
                 </p>
               )}
 
-              {status === 'error' && (
-                <p className="text-red-600 font-medium text-center">
-                  {errorMsg || 'Something went wrong. Please try again.'}
-                </p>
-              )}
             </form>
           </SlideInRight>
         </div>
