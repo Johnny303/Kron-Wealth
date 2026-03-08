@@ -25,6 +25,48 @@ const steps = [
   },
 ]
 
+// Spatial positions for each card (percentage-based)
+const cardPositions = [
+  { left: '12%', top: '5%' },    // Card 0 — top-left
+  { left: '62%', top: '0%' },    // Card 1 — upper-right
+  { left: '58%', top: '48%' },   // Card 2 — center-right
+  { left: '12%', top: '58%' },   // Card 3 — bottom-left
+]
+
+// Generate a cubic bezier path string between two points with curvature
+function generatePathD(x1, y1, x2, y2, offset = 0) {
+  const mx = (x1 + x2) / 2
+  const my = (y1 + y2) / 2
+  const dx = x2 - x1
+  const dy = y2 - y1
+  const len = Math.sqrt(dx * dx + dy * dy)
+  // Perpendicular unit vector
+  const nx = -dy / len
+  const ny = dx / len
+  // Curvature amount — proportional to distance
+  const curvature = len * 0.3
+  // Control points offset perpendicular to the midpoint
+  const cx1 = mx + nx * (curvature + offset)
+  const cy1 = my + ny * (curvature + offset)
+  // Second control point on the other side for S-curve feel
+  const cx2 = mx - nx * (curvature * 0.3 - offset)
+  const cy2 = my - ny * (curvature * 0.3 - offset)
+  return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`
+}
+
+// Calculate path length using a temporary SVG element
+function getPathLength(d) {
+  if (typeof document === 'undefined') return 0
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  path.setAttribute('d', d)
+  svg.appendChild(path)
+  document.body.appendChild(svg)
+  const length = path.getTotalLength()
+  document.body.removeChild(svg)
+  return length
+}
+
 export default function ApproachSection() {
   const [activeIndex, setActiveIndex] = useState(null)
   const [hoveredIndex, setHoveredIndex] = useState(null)
@@ -35,7 +77,7 @@ export default function ApproachSection() {
   // Refs for dynamic SVG lines
   const containerRef = useRef(null)
   const dotRefs = useRef([])
-  const [lineCoords, setLineCoords] = useState([])
+  const [lineData, setLineData] = useState([])
 
   // Scroll-triggered entrance animation
   useEffect(() => {
@@ -53,33 +95,47 @@ export default function ApproachSection() {
     const container = containerRef.current
     if (!container) return
     const containerRect = container.getBoundingClientRect()
-    const coords = []
+    const data = []
     for (let i = 0; i < dotRefs.current.length - 1; i++) {
       const a = dotRefs.current[i]
       const b = dotRefs.current[i + 1]
       if (!a || !b) continue
       const aRect = a.getBoundingClientRect()
       const bRect = b.getBoundingClientRect()
-      coords.push({
-        x1: aRect.left + aRect.width / 2 - containerRect.left,
-        y1: aRect.top + aRect.height / 2 - containerRect.top,
-        x2: bRect.left + bRect.width / 2 - containerRect.left,
-        y2: bRect.top + bRect.height / 2 - containerRect.top,
+      const x1 = aRect.left + aRect.width / 2 - containerRect.left
+      const y1 = aRect.top + aRect.height / 2 - containerRect.top
+      const x2 = bRect.left + bRect.width / 2 - containerRect.left
+      const y2 = bRect.top + bRect.height / 2 - containerRect.top
+      // Main path + two offset strands
+      const mainD = generatePathD(x1, y1, x2, y2, 0)
+      const leftD = generatePathD(x1, y1, x2, y2, -12)
+      const rightD = generatePathD(x1, y1, x2, y2, 12)
+      const mainLength = getPathLength(mainD)
+      const leftLength = getPathLength(leftD)
+      const rightLength = getPathLength(rightD)
+      data.push({
+        x1, y1, x2, y2,
+        strands: [
+          { d: leftD, length: leftLength, width: 1.5, opacity: 0.25 },
+          { d: mainD, length: mainLength, width: 2, opacity: 0.5 },
+          { d: rightD, length: rightLength, width: 1.5, opacity: 0.25 },
+        ],
+        glowD: mainD,
+        glowLength: mainLength,
       })
     }
-    setLineCoords(coords)
+    setLineData(data)
   }, [])
 
   // Recalculate lines on hover changes, entrance, and mount
   useEffect(() => {
     updateLines()
-    // Keep updating during transitions and stagger entrance animations
     const frames = []
     let count = 0
     const tick = () => {
       updateLines()
       count++
-      if (count < 150) frames.push(requestAnimationFrame(tick)) // ~2.5s of tracking
+      if (count < 150) frames.push(requestAnimationFrame(tick))
     }
     frames.push(requestAnimationFrame(tick))
     return () => frames.forEach(cancelAnimationFrame)
@@ -115,16 +171,14 @@ export default function ApproachSection() {
           <FadeInUp>
             <div className="text-center mb-16">
               <h2 className="font-display text-7xl md:text-8xl font-medium text-white mb-4">Our Approach</h2>
-              <p className="text-lg text-white/70">
-                A structured process designed around your life
-              </p>
+             
             </div>
           </FadeInUp>
 
-          {/* Desktop: zig-zag interactive timeline */}
+          {/* Desktop: spatial scattered layout with river paths */}
           <StaggerChildren className="hidden md:block" staggerDelay={0.15}>
-            <div className="relative" ref={containerRef}>
-              {/* SVG connector lines — dynamically positioned to follow dots */}
+            <div className="relative" ref={containerRef} style={{ height: '600px' }}>
+              {/* SVG connector paths — dynamically positioned to follow dots */}
               <svg
                 className="absolute inset-0 w-full h-full pointer-events-none"
                 style={{ zIndex: 1 }}
@@ -150,35 +204,36 @@ export default function ApproachSection() {
                     </feMerge>
                   </filter>
                 </defs>
-                {lineCoords.map((c, idx) => {
-                  const dx = c.x2 - c.x1
-                  const dy = c.y2 - c.y1
-                  const length = Math.sqrt(dx * dx + dy * dy)
+                {lineData.map((segment, idx) => {
                   const segDelay = idx * 900
-                  // Glow fades out after its draw finishes: draw ends at segDelay+900, fade starts there
                   const fadeDelay = segDelay + 900
                   return (
                     <g key={idx}>
-                      {/* Base line — recessed behind cards */}
-                      <line
-                        x1={c.x1} y1={c.y1}
-                        x2={c.x2} y2={c.y2}
-                        stroke="#8A5A2A"
-                        strokeWidth="2"
-                        opacity={hasEntered ? 0.5 : 0.15}
-                        filter="url(#line-shadow)"
-                        style={{ transition: 'opacity 900ms' }}
-                      />
-                      {/* Bright glow line — draws itself on entrance, then fades out */}
+                      {/* Base path strands — recessed behind cards */}
+                      {segment.strands.map((strand, si) => (
+                        <path
+                          key={`base-${si}`}
+                          d={strand.d}
+                          fill="none"
+                          stroke="#8A5A2A"
+                          strokeWidth={strand.width}
+                          opacity={hasEntered ? strand.opacity : 0.1}
+                          filter="url(#line-shadow)"
+                          strokeLinecap="round"
+                          style={{ transition: 'opacity 900ms' }}
+                        />
+                      ))}
+                      {/* Bright glow path — draws itself on entrance, then fades out */}
                       {hasEntered && (
-                        <line
-                          x1={c.x1} y1={c.y1}
-                          x2={c.x2} y2={c.y2}
+                        <path
+                          d={segment.glowD}
+                          fill="none"
                           stroke="#F0C27A"
                           strokeWidth="4"
                           filter="url(#line-glow)"
-                          strokeDasharray={length}
-                          strokeDashoffset={length}
+                          strokeLinecap="round"
+                          strokeDasharray={segment.glowLength}
+                          strokeDashoffset={segment.glowLength}
                           opacity="1"
                           style={{
                             animation: `drawLine 900ms ease-out ${segDelay}ms forwards, fadeGlow 1200ms ease-in ${fadeDelay}ms forwards`,
@@ -203,84 +258,104 @@ export default function ApproachSection() {
                 `}</style>
               </svg>
 
-              {/* Cards row */}
-              <div className="relative flex gap-6" style={{ zIndex: 2 }}>
-                {steps.map((step, i) => {
-                  const isTopRow = i % 2 === 0
-                  const isHovered = hoveredIndex === i
-                  const anyHovered = hoveredIndex !== null
-                  const isRevealed = revealedCards[i]
+              {/* Cards — absolute positioned spatially */}
+              {steps.map((step, i) => {
+                const isHovered = hoveredIndex === i
+                const anyHovered = hoveredIndex !== null
+                const isRevealed = revealedCards[i]
 
-                  return (
-                    <motion.div
-                      key={step.title}
-                      variants={staggerItem}
-                      className={`relative flex-1 transition-all duration-500 ${
-                        !isTopRow ? 'mt-[80px]' : ''
-                      } ${anyHovered && !isHovered ? 'opacity-50' : 'opacity-100'}`}
+                return (
+                  <motion.div
+                    key={step.title}
+                    variants={staggerItem}
+                    className={`absolute transition-all duration-500 ${
+                      anyHovered && !isHovered ? 'opacity-50' : 'opacity-100'
+                    }`}
+                    style={{
+                      left: cardPositions[i].left,
+                      top: cardPositions[i].top,
+                      transform: 'translate(-50%, -50%)',
+                      zIndex: isHovered ? 10 : 2,
+                      filter: isRevealed ? 'blur(0px)' : 'blur(6px)',
+                      transition: 'filter 600ms ease-out, opacity 300ms',
+                    }}
+                    onMouseEnter={() => setHoveredIndex(i)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                  >
+                    {/* Card — elevated above the connector lines */}
+                    <div
+                      className={`relative w-64 overflow-hidden backdrop-blur-sm border rounded-xl cursor-default
+                        transition-all pt-6 px-6 ${
+                          isHovered
+                            ? 'border-kron-gold pb-6'
+                            : 'bg-white/10 border-white/20 pb-6'
+                        }`}
                       style={{
-                        filter: isRevealed ? 'blur(0px)' : 'blur(6px)',
-                        transition: 'filter 600ms ease-out, opacity 300ms',
+                        transitionDuration: isHovered ? '1500ms' : '300ms',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
                       }}
-                      onMouseEnter={() => setHoveredIndex(i)}
-                      onMouseLeave={() => setHoveredIndex(null)}
                     >
-                      {/* Card — elevated above the connector lines */}
+                      {/* Ripple — expands from dot position to fill the card */}
                       <div
-                        className={`relative w-full backdrop-blur-sm border rounded-xl cursor-default
-                          transition-all pt-6 px-6 ${
-                            isHovered
-                              ? 'bg-kron-gold border-kron-gold pb-16'
-                              : 'bg-white/10 border-white/20 pb-6'
-                          }`}
+                        className="absolute rounded-full bg-kron-gold pointer-events-none"
                         style={{
-                          transitionDuration: isHovered ? '1500ms' : '300ms',
-                          boxShadow: '0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
+                          width: '16px',
+                          height: '16px',
+                          left: '50%',
+                          bottom: isHovered ? '3.5rem' : '1.25rem',
+                          transform: isHovered
+                            ? 'translate(-50%, 50%) scale(60)'
+                            : 'translate(-50%, 50%) scale(0)',
+                          transition: isHovered
+                            ? 'transform 3000ms cubic-bezier(0.25, 0.46, 0.45, 0.94), bottom 3000ms ease'
+                            : 'transform 800ms ease-in, bottom 600ms ease',
+                          zIndex: 0,
                         }}
+                      />
+
+                      <h3
+                        className={`relative font-medium text-white text-center mb-2 transition-all whitespace-nowrap ${
+                          isHovered ? 'text-2xl' : 'text-lg'
+                        }`}
+                        style={{ transitionDuration: isHovered ? '1500ms' : '300ms', zIndex: 1 }}
                       >
-                        <h3
-                          className={`font-medium text-white text-center mb-2 transition-all whitespace-nowrap ${
-                            isHovered ? 'text-2xl' : 'text-lg'
-                          }`}
-                          style={{ transitionDuration: isHovered ? '1500ms' : '300ms' }}
-                        >
-                          {step.title}
-                        </h3>
+                        {step.title}
+                      </h3>
 
-                        {/* Description — revealed AFTER gold bg finishes (1500ms delay) */}
-                        <AnimatePresence>
-                          {isHovered && showText && (
-                            <motion.p
-                              className="text-base text-white/80 text-center leading-relaxed overflow-hidden"
-                              initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                              animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
-                              exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                              transition={{ duration: 0.4, ease: 'easeOut' }}
-                            >
-                              {step.description}
-                            </motion.p>
-                          )}
-                        </AnimatePresence>
+                      {/* Description — revealed AFTER gold bg finishes (1500ms delay) */}
+                      <AnimatePresence>
+                        {isHovered && showText && (
+                          <motion.p
+                            className="relative text-base text-white/80 text-center leading-relaxed overflow-hidden"
+                            style={{ zIndex: 1 }}
+                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                            animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
+                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                          >
+                            {step.description}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
 
-                        {/* Dot — absolutely positioned inside the card, doesn't shift text */}
-                        <div
-                          ref={el => dotRefs.current[i] = el}
-                          className={`absolute left-1/2 -translate-x-1/2 rounded-full bg-kron-gold transition-all duration-300 ${
-                            isHovered ? 'w-6 h-6' : 'w-3 h-3'
-                          }`}
-                          style={{
-                            [isTopRow ? 'bottom' : 'top']: '0.75rem',
-                            transition: 'all 300ms',
-                            ...(hasEntered ? {
-                              animation: `dotBlink 750ms ease-in-out ${i * 900}ms`,
-                            } : {}),
-                          }}
-                        />
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
+                      {/* Dot — inside card, under text */}
+                      <div
+                        ref={el => dotRefs.current[i] = el}
+                        className={`relative mx-auto mt-3 rounded-full bg-kron-gold transition-all duration-300 ${
+                          isHovered ? 'w-6 h-6' : 'w-3 h-3'
+                        }`}
+                        style={{
+                          transition: 'all 300ms',
+                          zIndex: 1,
+                          ...(hasEntered ? {
+                            animation: `dotBlink 750ms ease-in-out ${i * 900}ms`,
+                          } : {}),
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+                )
+              })}
             </div>
           </StaggerChildren>
 
