@@ -18,6 +18,11 @@
   --font-display: 'RetroSignature', cursive;
 }
 
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: theme(--color-kron-sage) transparent;
+}
+
 @layer base {
   html.lenis, html.lenis body {
     height: auto;
