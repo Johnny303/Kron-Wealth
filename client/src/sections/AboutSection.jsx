@@ -4,7 +4,7 @@ export default function AboutSection() {
   return (
     <section id="about" className="scroll-mt-16">
       {/* Founder section */}
-      <div className="py-24 px-6">
+      <div className="py-16 px-5 md:py-24 md:px-6">
         <div className="max-w-6xl mx-auto">
           <FadeInUp>
             <h2 className="font-display text-7xl md:text-8xl font-medium text-kron-green text-center mb-4">
@@ -15,11 +15,11 @@ export default function AboutSection() {
             </p>
           </FadeInUp>
 
-          <div className="grid md:grid-cols-2 gap-16 items-start">
-            {/* Founder headshot with parallax + sticky on desktop */}
+          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+            {/* Founder headshot — full-width on mobile, sticky on desktop */}
             <div className="flex justify-center md:sticky md:top-24">
-              <ParallaxLayer speed={0.15} className="flex justify-center">
-                <div className="w-72 h-72 rounded-2xl bg-kron-brown flex items-center justify-center">
+              <ParallaxLayer speed={0.15} className="flex justify-center w-full">
+                <div className="w-full max-w-xs md:w-72 md:h-72 aspect-square rounded-2xl bg-kron-brown flex items-center justify-center">
                   <svg className="w-24 h-24 text-white/20" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
                   </svg>
@@ -64,7 +64,7 @@ export default function AboutSection() {
       </div>
 
       {/* Philosophy */}
-      <div id="philosophy" className="bg-kron-mist py-24 px-6">
+      <div id="philosophy" className="bg-kron-mist py-16 px-5 md:py-24 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <FadeInUp>
             <h3 className="text-3xl font-bold text-kron-green mb-6">Our Philosophy</h3>
@@ -87,13 +87,13 @@ export default function AboutSection() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="#approach"
-                className="inline-block px-6 py-3 bg-kron-green text-white font-medium rounded-lg hover:bg-kron-brown transition-colors"
+                className="inline-block px-6 py-3 min-h-[48px] bg-kron-green text-white font-medium rounded-lg hover:bg-kron-brown transition-colors text-center flex items-center justify-center"
               >
                 Our Approach
               </a>
               <a
                 href="#contact"
-                className="inline-block px-6 py-3 border border-kron-green text-kron-green font-medium rounded-lg hover:bg-kron-green hover:text-white transition-colors"
+                className="inline-block px-6 py-3 min-h-[48px] border border-kron-green text-kron-green font-medium rounded-lg hover:bg-kron-green hover:text-white transition-colors text-center flex items-center justify-center"
               >
                 Get in Touch
               </a>

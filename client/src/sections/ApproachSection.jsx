@@ -255,6 +255,18 @@ export default function ApproachSection() {
                     50% { box-shadow: 0 0 24px 10px rgba(240, 194, 122, 0.9); }
                     100% { box-shadow: 0 0 0 0 rgba(240, 194, 122, 0); }
                   }
+                  @keyframes cornerDraw {
+                    from { clip-path: inset(0 100% 100% 0); }
+                    to { clip-path: inset(0 0 0 0); }
+                  }
+                  @keyframes cornerDrawBR {
+                    from { clip-path: inset(100% 0 0 100%); }
+                    to { clip-path: inset(0 0 0 0); }
+                  }
+                  @keyframes underlineDraw {
+                    from { transform: scaleX(0); }
+                    to { transform: scaleX(1); }
+                  }
                 `}</style>
               </svg>
 
@@ -285,16 +297,89 @@ export default function ApproachSection() {
                     {/* Card — elevated above the connector lines */}
                     <div
                       className={`relative w-64 overflow-hidden backdrop-blur-sm border rounded-xl cursor-default
-                        transition-all pt-6 px-6 ${
+                        pt-6 px-6 ${
                           isHovered
                             ? 'border-kron-gold pb-6'
                             : 'bg-white/10 border-white/20 pb-6'
                         }`}
                       style={{
-                        transitionDuration: isHovered ? '1500ms' : '300ms',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
+                        transition: [
+                          `box-shadow ${isHovered ? '800ms' : '400ms'} cubic-bezier(0.4, 0, 0.2, 1)`,
+                          `border-color ${isHovered ? '600ms' : '200ms'} ease-out`,
+                          `background-color ${isHovered ? '1500ms' : '300ms'} ease`,
+                        ].join(', '),
+                        boxShadow: isHovered
+                          ? [
+                              '0 2px 6px rgba(185, 122, 69, 0.45)',
+                              '0 12px 32px rgba(185, 122, 69, 0.2)',
+                              '0 24px 64px rgba(0, 0, 0, 0.5)',
+                              'inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                              'inset 0 -1px 0 rgba(185, 122, 69, 0.1)',
+                            ].join(', ')
+                          : '0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
                       }}
                     >
+                      {/* Hover surface — gradient mesh + noise grain */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none"
+                        style={{
+                          opacity: isHovered ? 1 : 0,
+                          transition: 'opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1)',
+                          zIndex: 0,
+                          background: [
+                            'radial-gradient(ellipse 80% 60% at 20% 10%, rgba(240, 194, 122, 0.12) 0%, transparent 60%)',
+                            'radial-gradient(ellipse 60% 80% at 85% 80%, rgba(185, 122, 69, 0.08) 0%, transparent 50%)',
+                            'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 70%)',
+                          ].join(', '),
+                        }}
+                      />
+                      {/* Noise grain overlay */}
+                      <svg className="absolute inset-0 w-full h-full rounded-xl pointer-events-none" style={{
+                        opacity: isHovered ? 0.06 : 0,
+                        transition: 'opacity 1400ms ease',
+                        zIndex: 0,
+                        mixBlendMode: 'overlay',
+                      }}>
+                        <filter id={`grain-${i}`}>
+                          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+                          <feColorMatrix type="saturate" values="0" />
+                        </filter>
+                        <rect width="100%" height="100%" filter={`url(#grain-${i})`} />
+                      </svg>
+
+                      {/* Corner accent — top-left */}
+                      <div
+                        className="absolute pointer-events-none"
+                        style={{
+                          top: 0,
+                          left: 0,
+                          width: 28,
+                          height: 28,
+                          borderTop: '2px solid #F0C27A',
+                          borderLeft: '2px solid #F0C27A',
+                          borderTopLeftRadius: 12,
+                          opacity: isHovered ? 1 : 0,
+                          animation: isHovered ? 'cornerDraw 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards' : 'none',
+                          zIndex: 3,
+                        }}
+                      />
+                      {/* Corner accent — bottom-right */}
+                      <div
+                        className="absolute pointer-events-none"
+                        style={{
+                          bottom: 0,
+                          right: 0,
+                          width: 28,
+                          height: 28,
+                          borderBottom: '2px solid #F0C27A',
+                          borderRight: '2px solid #F0C27A',
+                          borderBottomRightRadius: 12,
+                          opacity: isHovered ? 1 : 0,
+                          animation: isHovered ? 'cornerDrawBR 500ms cubic-bezier(0.22, 1, 0.36, 1) 150ms forwards' : 'none',
+                          zIndex: 3,
+                        }}
+                      />
+
                       {/* Ripple — expands from dot position to fill the card */}
                       <div
                         className="absolute rounded-full bg-kron-gold pointer-events-none"
@@ -314,12 +399,32 @@ export default function ApproachSection() {
                       />
 
                       <h3
-                        className={`relative font-medium text-white text-center mb-2 transition-all whitespace-nowrap ${
+                        className={`relative font-medium text-white text-center mb-2 whitespace-nowrap ${
                           isHovered ? 'text-2xl' : 'text-lg'
                         }`}
-                        style={{ transitionDuration: isHovered ? '1500ms' : '300ms', zIndex: 1 }}
+                        style={{
+                          transition: [
+                            `font-size ${isHovered ? '1500ms' : '300ms'} ease`,
+                            `letter-spacing ${isHovered ? '1200ms' : '250ms'} cubic-bezier(0.22, 1, 0.36, 1)`,
+                          ].join(', '),
+                          letterSpacing: isHovered ? '0.06em' : '0em',
+                          zIndex: 1,
+                        }}
                       >
                         {step.title}
+                        {/* Decorative underline — draws in on hover */}
+                        <span
+                          className="block mx-auto"
+                          style={{
+                            height: 1.5,
+                            width: '60%',
+                            marginTop: 4,
+                            background: 'linear-gradient(90deg, transparent, #F0C27A, transparent)',
+                            transform: isHovered ? 'scaleX(1)' : 'scaleX(0)',
+                            transition: `transform ${isHovered ? '800ms' : '200ms'} cubic-bezier(0.22, 1, 0.36, 1) ${isHovered ? '600ms' : '0ms'}`,
+                            transformOrigin: 'center',
+                          }}
+                        />
                       </h3>
 
                       {/* Description — revealed AFTER gold bg finishes (1500ms delay) */}
@@ -359,13 +464,13 @@ export default function ApproachSection() {
             </div>
           </StaggerChildren>
 
-          {/* Mobile: vertical tap-to-expand timeline */}
+          {/* Mobile: enhanced vertical tap-to-expand timeline */}
           <StaggerChildren className="md:hidden" staggerDelay={0.12}>
-            <div className="relative pl-8">
+            <div className="relative pl-10">
               {/* Vertical gold line */}
-              <div className="absolute left-[5px] top-0 bottom-0 w-0.5 bg-kron-gold/40" />
+              <div className="absolute left-[11px] top-0 bottom-0 w-0.5 bg-kron-gold/40" />
 
-              <div className="space-y-6">
+              <div className="space-y-5">
                 {steps.map((step, idx) => (
                   <motion.div
                     key={step.title}
@@ -373,25 +478,35 @@ export default function ApproachSection() {
                     className="relative"
                     onClick={() => setActiveIndex(activeIndex === idx ? null : idx)}
                   >
-                    {/* Gold dot marker */}
-                    <div className="absolute -left-8 top-4 w-3 h-3 rounded-full bg-kron-gold ring-4 ring-kron-green z-10" />
+                    {/* Step number dot */}
+                    <div className="absolute -left-10 top-5 w-6 h-6 rounded-full bg-kron-gold flex items-center justify-center z-10 ring-4 ring-kron-green">
+                      <span className="text-xs font-bold text-kron-green">{idx + 1}</span>
+                    </div>
 
-                    {/* Card */}
+                    {/* Card — larger padding, better tap target */}
                     <div
-                      className={`bg-white/10 backdrop-blur-sm border rounded-xl p-5 cursor-pointer
-                        transition-all duration-300
-                        ${activeIndex === idx ? 'border-kron-gold/60 shadow-lg' : 'border-white/20'}`}
+                      className={`bg-white/10 backdrop-blur-sm border rounded-xl p-6 cursor-pointer
+                        min-h-[48px] transition-all duration-300 active:scale-[0.98]
+                        ${activeIndex === idx ? 'border-kron-gold/60 shadow-lg shadow-kron-gold/10' : 'border-white/20'}`}
                     >
-                      <h3 className="text-lg font-bold text-white">{step.title}</h3>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-bold text-white">{step.title}</h3>
+                        <svg
+                          className={`w-4 h-4 text-kron-gold/60 shrink-0 ml-3 transition-transform duration-300 ${activeIndex === idx ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
 
                       <AnimatePresence>
                         {activeIndex === idx && (
                           <motion.p
-                            className="text-sm text-white/70 leading-relaxed overflow-hidden"
+                            className="text-[15px] text-white/70 leading-relaxed overflow-hidden"
                             initial={{ opacity: 0, height: 0, marginTop: 0 }}
                             animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
                             exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                            transition={{ duration: 0.3, ease: 'easeOut' }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                           >
                             {step.description}
                           </motion.p>
@@ -422,13 +537,13 @@ export default function ApproachSection() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="#services"
-                className="inline-block px-6 py-3 bg-kron-green text-white font-medium rounded-lg hover:bg-kron-brown transition-colors"
+                className="inline-block px-6 py-3 min-h-[48px] bg-kron-green text-white font-medium rounded-lg hover:bg-kron-brown transition-colors text-center flex items-center justify-center"
               >
                 Our Services
               </a>
               <a
                 href="#contact"
-                className="inline-block px-6 py-3 border border-kron-green text-kron-green font-medium rounded-lg hover:bg-kron-green hover:text-white transition-colors"
+                className="inline-block px-6 py-3 min-h-[48px] border border-kron-green text-kron-green font-medium rounded-lg hover:bg-kron-green hover:text-white transition-colors text-center flex items-center justify-center"
               >
                 Get in Touch
               </a>

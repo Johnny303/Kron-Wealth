@@ -1,0 +1,73 @@
+<h2>Design V2: Wider Curves, Thinner Ribbon</h2>
+<p class="subtitle">The path now swings edge-to-edge across the full viewport width with a thinner ~5-6px stroke</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Updated: Full-width sweeping curves</div>
+    <div class="mockup-body" style="background: #10312C; padding: 0; position: relative; min-height: 600px; overflow: hidden;">
+      <!-- Section labels -->
+      <div style="position: absolute; left: 16px; top: 10px; color: rgba(255,255,255,0.4); font-size: 11px;">ABOUT SECTION</div>
+      <div style="position: absolute; left: 16px; top: 155px; color: rgba(255,255,255,0.4); font-size: 11px;">APPROACH SECTION</div>
+      <div style="position: absolute; left: 16px; top: 305px; color: rgba(255,255,255,0.4); font-size: 11px;">SERVICES SECTION</div>
+      <div style="position: absolute; left: 16px; top: 455px; color: rgba(255,255,255,0.4); font-size: 11px;">CONTACT SECTION</div>
+
+      <!-- Section dividers -->
+      <div style="position: absolute; top: 150px; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.15);"></div>
+      <div style="position: absolute; top: 300px; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.15);"></div>
+      <div style="position: absolute; top: 450px; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.15);"></div>
+
+      <!-- Edge indicators -->
+      <div style="position: absolute; top: 0; bottom: 0; left: 0; width: 1px; background: rgba(255,255,255,0.08);"></div>
+      <div style="position: absolute; top: 0; bottom: 0; right: 0; width: 1px; background: rgba(255,255,255,0.08);"></div>
+
+      <svg viewBox="0 0 400 600" style="width: 100%; height: 600px;" fill="none" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="goldGrad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#D4A056"/>
+            <stop offset="40%" stop-color="#B97A45"/>
+            <stop offset="70%" stop-color="#C4903A"/>
+            <stop offset="100%" stop-color="#8B5E30"/>
+          </linearGradient>
+          <filter id="glow2">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Subtle glow behind -->
+        <path d="M 200 20 C 390 60, 395 100, 380 150 C 340 220, 20 200, 15 280 C 10 350, 380 350, 390 420 C 395 470, 30 480, 20 530 C 15 560, 200 575, 200 580"
+              stroke="rgba(185, 122, 69, 0.2)" stroke-width="14" stroke-linecap="round" filter="url(#glow2)"/>
+
+        <!-- Main thinner ribbon - sweeping edge to edge -->
+        <path d="M 200 20 C 390 60, 395 100, 380 150 C 340 220, 20 200, 15 280 C 10 350, 380 350, 390 420 C 395 470, 30 480, 20 530 C 15 560, 200 575, 200 580"
+              stroke="url(#goldGrad2)" stroke-width="5" stroke-linecap="round"
+              stroke-dasharray="1800" stroke-dashoffset="700">
+          <animate attributeName="stroke-dashoffset" from="1800" to="0" dur="3s" fill="freeze"/>
+        </path>
+
+        <!-- Labels showing the sweep -->
+        <text x="385" y="145" fill="rgba(255,255,255,0.25)" font-size="8" text-anchor="end">← right edge</text>
+        <text x="30" y="275" fill="rgba(255,255,255,0.25)" font-size="8">left edge →</text>
+        <text x="385" y="415" fill="rgba(255,255,255,0.25)" font-size="8" text-anchor="end">← right edge</text>
+        <text x="30" y="525" fill="rgba(255,255,255,0.25)" font-size="8">left edge →</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 1.5rem;">
+  <h3>What Changed</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    <div style="background: rgba(185,122,69,0.08); border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(185,122,69,0.2);">
+      <h4 style="color: #B97A45; margin-top: 0;">Thinner Stroke</h4>
+      <p>Reduced from ~10-15px to <strong>5-6px</strong> with a softer glow aura behind it. More elegant, less heavy.</p>
+    </div>
+    <div style="background: rgba(185,122,69,0.08); border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(185,122,69,0.2);">
+      <h4 style="color: #B97A45; margin-top: 0;">Full-Width Curves</h4>
+      <p>The path now sweeps from <strong>near the left edge to near the right edge</strong> of the viewport, creating dramatic S-curves that use the full screen width.</p>
+    </div>
+  </div>
+</div>

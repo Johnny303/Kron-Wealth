@@ -1,0 +1,77 @@
+<h2>Design: Scroll-Triggered Gold Ribbon Path</h2>
+<p class="subtitle">A continuous gold gradient ribbon that draws itself between About → Approach → Services → Contact as you scroll</p>
+
+<div class="section">
+  <h3>Architecture</h3>
+  <div class="mockup">
+    <div class="mockup-header">Component: ScrollPath (full-page SVG overlay)</div>
+    <div class="mockup-body" style="background: #10312C; padding: 0; position: relative; min-height: 600px; overflow: hidden;">
+      <!-- Section labels -->
+      <div style="position: absolute; left: 16px; top: 10px; color: rgba(255,255,255,0.4); font-size: 11px;">ABOUT SECTION</div>
+      <div style="position: absolute; left: 16px; top: 155px; color: rgba(255,255,255,0.4); font-size: 11px;">APPROACH SECTION</div>
+      <div style="position: absolute; left: 16px; top: 305px; color: rgba(255,255,255,0.4); font-size: 11px;">SERVICES SECTION</div>
+      <div style="position: absolute; left: 16px; top: 455px; color: rgba(255,255,255,0.4); font-size: 11px;">CONTACT SECTION</div>
+
+      <!-- Section dividers -->
+      <div style="position: absolute; top: 150px; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.15);"></div>
+      <div style="position: absolute; top: 300px; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.15);"></div>
+      <div style="position: absolute; top: 450px; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.15);"></div>
+
+      <!-- The gold path -->
+      <svg viewBox="0 0 400 600" style="width: 100%; height: 600px;" fill="none">
+        <defs>
+          <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#D4A056"/>
+            <stop offset="30%" stop-color="#B97A45"/>
+            <stop offset="60%" stop-color="#C4903A"/>
+            <stop offset="100%" stop-color="#8B5E30"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Glow layer -->
+        <path d="M 200 30 C 320 80, 350 120, 300 150 C 250 180, 100 200, 80 250 C 60 300, 150 320, 250 350 C 350 380, 320 420, 200 450 C 80 480, 120 530, 200 570"
+              stroke="rgba(185, 122, 69, 0.3)" stroke-width="20" stroke-linecap="round" filter="url(#glow)"/>
+
+        <!-- Main ribbon -->
+        <path d="M 200 30 C 320 80, 350 120, 300 150 C 250 180, 100 200, 80 250 C 60 300, 150 320, 250 350 C 350 380, 320 420, 200 450 C 80 480, 120 530, 200 570"
+              stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="1500" stroke-dashoffset="600"
+              style="transition: stroke-dashoffset 0.1s linear;">
+          <animate attributeName="stroke-dashoffset" from="1500" to="0" dur="3s" fill="freeze"/>
+        </path>
+
+        <!-- Scroll progress indicator -->
+        <text x="200" y="595" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="10">↓ draws as you scroll ↓</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Key Implementation Details</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    <div style="background: rgba(185,122,69,0.08); border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(185,122,69,0.2);">
+      <h4 style="color: #B97A45; margin-top: 0;">New Component</h4>
+      <p><code>ScrollPath.jsx</code> — A single full-page SVG positioned with <code>position: fixed</code>, <code>pointer-events: none</code>, behind content (<code>z-index: 1</code>).</p>
+    </div>
+    <div style="background: rgba(185,122,69,0.08); border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(185,122,69,0.2);">
+      <h4 style="color: #B97A45; margin-top: 0;">Scroll Tracking</h4>
+      <p><code>useScroll()</code> from motion/react maps total scroll progress (0→1) to <code>stroke-dashoffset</code> (pathLength→0), progressively revealing the path.</p>
+    </div>
+    <div style="background: rgba(185,122,69,0.08); border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(185,122,69,0.2);">
+      <h4 style="color: #B97A45; margin-top: 0;">Responsive Path</h4>
+      <p>Path control points are calculated from actual section DOM positions via <code>useRef</code> + <code>ResizeObserver</code>. Curves recalculate on window resize.</p>
+    </div>
+    <div style="background: rgba(185,122,69,0.08); border-radius: 12px; padding: 1.25rem; border: 1px solid rgba(185,122,69,0.2);">
+      <h4 style="color: #B97A45; margin-top: 0;">Mobile</h4>
+      <p>Path simplifies to gentler S-curves on smaller screens. Stroke-width reduces to ~6px. Hidden below 480px width for performance.</p>
+    </div>
+  </div>
+</div>

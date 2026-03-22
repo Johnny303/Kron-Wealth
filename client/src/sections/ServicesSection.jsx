@@ -98,111 +98,23 @@ const services = [
 
 const layoutSpring = { type: 'spring', stiffness: 100, damping: 30, mass: 2 }
 
-function ServiceIcon({ icon, size = 'md' }) {
-  const sizeClasses = size === 'sm' ? 'w-10 h-10' : 'w-12 h-12'
-  const iconSize = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6'
-  return (
-    <div className={`${sizeClasses} rounded-xl bg-kron-gold/10 flex items-center justify-center shrink-0`}>
-      <svg className={`${iconSize} text-kron-gold`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        {icon}
-      </svg>
-    </div>
-  )
-}
+/* ── Helpers ── */
 
-function ExpandedContent({ service, onClose }) {
-  return (
-    <motion.div
-      key="expanded"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
-      className="absolute inset-0 p-6 md:p-8 flex flex-col overflow-hidden"
-    >
-      <button
-        onClick={(e) => { e.stopPropagation(); onClose() }}
-        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-kron-green/10 hover:bg-kron-green/20 transition-colors text-kron-green z-10"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
-      <div className="flex items-center gap-3 mb-4 pr-8">
-        <ServiceIcon icon={service.icon} size="sm" />
-        <h3 className="text-lg font-bold text-kron-green">{service.title}</h3>
-      </div>
-
-      <div className="overflow-y-auto flex-1 pr-1 space-y-3 text-sm text-kron-brown leading-relaxed scrollbar-thin">
-        <p>{service.details.intro}</p>
-        <p className="font-medium text-kron-green/80">{service.details.subtitle}</p>
-
-        {service.details.bullets.length > 0 && (
-          <ul className="space-y-2 ml-1">
-            {service.details.bullets.map((b) => (
-              <li key={b.label} className="flex gap-2">
-                <span className="text-kron-gold mt-1 shrink-0">&#x2022;</span>
-                <span><strong className="text-kron-green">{b.label}:</strong> {b.text}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <p>{service.details.outro}</p>
-      </div>
-
-      <a
-        href="#contact"
-        onClick={(e) => e.stopPropagation()}
-        className="mt-4 inline-block text-center px-6 py-3 bg-kron-gold text-white font-semibold rounded-lg hover:opacity-90 transition-opacity shrink-0"
-      >
-        Get Started
-      </a>
-    </motion.div>
-  )
-}
-
-function TileContent({ service, delay = 0 }) {
-  return (
-    <motion.div
-      key="tile"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className="w-full h-full flex items-center justify-center"
-    >
-      <ServiceIcon icon={service.icon} size="sm" />
-    </motion.div>
-  )
-}
-
-function DefaultContent({ service, delay = 0 }) {
-  return (
-    <motion.div
-      key="default"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6, delay }}
-      className="p-8 flex flex-col"
-    >
-      <div className="w-12 h-12 rounded-xl bg-kron-gold/10 flex items-center justify-center mb-6">
-        <svg className="w-6 h-6 text-kron-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          {service.icon}
-        </svg>
-      </div>
-      <h3 className="text-lg font-bold text-kron-green mb-3">{service.title}</h3>
-      <p className="text-sm text-kron-brown leading-relaxed">{service.description}</p>
-    </motion.div>
-  )
-}
-
-function getInactiveRow(cardIndex, activeIndex) {
+function getTileRow(cardIndex, activeIdx, pendingIdx, isShuffling) {
+  if (isShuffling && pendingIdx !== null) {
+    let row = 0
+    for (let i = 0; i < services.length; i++) {
+      if (i === activeIdx) continue
+      if (i === pendingIdx) continue
+      if (i === cardIndex) return row
+      row++
+    }
+    if (cardIndex === pendingIdx) return row
+    return row
+  }
   let row = 0
   for (let i = 0; i < services.length; i++) {
-    if (i === activeIndex) continue
+    if (i === activeIdx) continue
     if (i === cardIndex) return row
     row++
   }
@@ -221,31 +133,304 @@ function useWindowWidth() {
   return width
 }
 
+/* ── Card content components ── */
+
+function ServiceIcon({ icon, size = 'md', glow = false }) {
+  const sizeClasses = size === 'sm' ? 'w-10 h-10' : 'w-12 h-12'
+  const iconSize = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6'
+  return (
+    <div
+      className={`${sizeClasses} rounded-xl flex items-center justify-center shrink-0 relative`}
+      style={{
+        background: 'linear-gradient(135deg, rgba(185,122,69,0.12) 0%, rgba(185,122,69,0.06) 100%)',
+        boxShadow: glow
+          ? '0 0 20px rgba(185,122,69,0.15), inset 0 1px 2px rgba(185,122,69,0.1)'
+          : 'inset 0 1px 2px rgba(185,122,69,0.08)',
+      }}
+    >
+      <svg className={`${iconSize} text-kron-gold`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {icon}
+      </svg>
+    </div>
+  )
+}
+
+function ExpandedContent({ service, onClose }) {
+  return (
+    <motion.div
+      key="expanded"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6 }}
+      className="absolute inset-0 flex flex-col"
+    >
+      {/* Close button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onClose() }}
+        className="absolute top-4 right-4 w-11 h-11 md:w-9 md:h-9 flex items-center justify-center rounded-full border border-kron-sage/30 hover:border-kron-gold/40 hover:bg-kron-gold/5 transition-all text-kron-brown/60 hover:text-kron-gold z-10"
+      >
+        <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      {/* Header */}
+      <div className="shrink-0 p-6 md:p-8 pb-0">
+        <div className="flex items-center gap-4 mb-5 pr-10">
+          <ServiceIcon icon={service.icon} size="sm" glow />
+          <div>
+            <h3 className="text-xl font-bold text-kron-green tracking-tight">{service.title}</h3>
+          </div>
+        </div>
+        {/* Gold divider */}
+        <div
+          className="h-px mb-5"
+          style={{ background: 'linear-gradient(to right, rgba(185,122,69,0.4), rgba(185,122,69,0.1), transparent)' }}
+        />
+      </div>
+
+      {/* Scrollable body */}
+      <div data-lenis-prevent className="flex-1 min-h-0 overflow-y-auto px-6 md:px-8 space-y-4 text-[15px] text-kron-brown leading-[1.7] scrollbar-thin">
+        <p>{service.details.intro}</p>
+        <p className="font-medium text-kron-green/80 italic">{service.details.subtitle}</p>
+
+        {service.details.bullets.length > 0 && (
+          <ul className="space-y-3">
+            {service.details.bullets.map((b) => (
+              <li key={b.label} className="flex gap-3">
+                <span
+                  className="mt-[9px] shrink-0 w-1.5 h-1.5 rounded-full"
+                  style={{ background: 'linear-gradient(135deg, #B97A45, #D4A574)' }}
+                />
+                <span>
+                  <strong className="text-kron-green font-semibold">{b.label}:</strong>{' '}
+                  {b.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p>{service.details.outro}</p>
+      </div>
+
+      {/* CTA */}
+      <div className="shrink-0 px-6 md:px-8 py-5">
+        <a
+          href="#contact"
+          onClick={(e) => e.stopPropagation()}
+          className="inline-block text-center px-7 py-3 min-h-[48px] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm tracking-wide uppercase"
+          style={{
+            background: 'linear-gradient(135deg, #B97A45 0%, #D4A574 100%)',
+            boxShadow: '0 2px 8px rgba(185,122,69,0.3)',
+          }}
+        >
+          Get Started
+        </a>
+      </div>
+    </motion.div>
+  )
+}
+
+function TileContent({ service, delay = 0 }) {
+  return (
+    <motion.div
+      key="tile"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{ duration: 0.5, delay }}
+      className="w-full h-full flex items-center justify-center"
+    >
+      <ServiceIcon icon={service.icon} size="sm" />
+    </motion.div>
+  )
+}
+
+function DefaultContent({ service, delay = 0 }) {
+  return (
+    <motion.div
+      key="default"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, delay }}
+      className="p-8 flex flex-col relative"
+    >
+      <ServiceIcon icon={service.icon} glow />
+      <h3 className="text-lg font-bold text-kron-green mt-5 mb-3 tracking-tight">{service.title}</h3>
+      {/* Small gold accent line */}
+      <div
+        className="w-8 h-px mb-4"
+        style={{ background: 'linear-gradient(to right, rgba(185,122,69,0.5), transparent)' }}
+      />
+      <p className="text-sm text-kron-brown/80 leading-relaxed">{service.description}</p>
+    </motion.div>
+  )
+}
+
+/* ── Mobile carousel dot indicators ── */
+function CarouselDots({ count, activeIndex }) {
+  return (
+    <div className="flex justify-center gap-2 mt-4">
+      {Array.from({ length: count }, (_, i) => (
+        <div
+          key={i}
+          className={`h-2 rounded-full transition-all duration-300 ${
+            i === activeIndex ? 'w-6 bg-kron-gold' : 'w-2 bg-white/30'
+          }`}
+        />
+      ))}
+    </div>
+  )
+}
+
+/* ── Mobile expanded modal ── */
+function MobileExpandedModal({ service, serviceIndex, onClose, onNavigate, total }) {
+  // Lock body scroll
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  // Swipe navigation
+  const touchStartX = useRef(null)
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return
+    const diff = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && serviceIndex < total - 1) onNavigate(serviceIndex + 1)
+      else if (diff < 0 && serviceIndex > 0) onNavigate(serviceIndex - 1)
+    }
+    touchStartX.current = null
+  }
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[70] flex flex-col bg-white"
+      initial={{ opacity: 0, y: '100%' }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: '100%' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Header bar */}
+      <div className="shrink-0 flex items-center justify-between px-5 pt-[max(env(safe-area-inset-top),16px)] pb-3 border-b border-kron-sage/20">
+        <div className="flex items-center gap-3">
+          <ServiceIcon icon={service.icon} size="sm" glow />
+          <h3 className="text-lg font-bold text-kron-green tracking-tight">{service.title}</h3>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-11 h-11 flex items-center justify-center rounded-full border border-kron-sage/30 active:bg-kron-gold/5 text-kron-brown/60"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Scrollable body */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-5 py-6 space-y-4 text-[15px] text-kron-brown leading-[1.7]">
+        <p className="text-base">{service.details.intro}</p>
+        <p className="font-medium text-kron-green/80 italic">{service.details.subtitle}</p>
+
+        {service.details.bullets.length > 0 && (
+          <ul className="space-y-3">
+            {service.details.bullets.map((b) => (
+              <li key={b.label} className="flex gap-3">
+                <span
+                  className="mt-[9px] shrink-0 w-1.5 h-1.5 rounded-full"
+                  style={{ background: 'linear-gradient(135deg, #B97A45, #D4A574)' }}
+                />
+                <span>
+                  <strong className="text-kron-green font-semibold">{b.label}:</strong>{' '}
+                  {b.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p>{service.details.outro}</p>
+      </div>
+
+      {/* Bottom CTA + nav indicator */}
+      <div className="shrink-0 px-5 py-4 border-t border-kron-sage/20" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+        <a
+          href="#contact"
+          onClick={onClose}
+          className="block text-center px-7 py-4 min-h-[52px] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity text-sm tracking-wide uppercase"
+          style={{
+            background: 'linear-gradient(135deg, #B97A45 0%, #D4A574 100%)',
+            boxShadow: '0 2px 8px rgba(185,122,69,0.3)',
+          }}
+        >
+          Get Started
+        </a>
+        <p className="text-center text-xs text-kron-brown/40 mt-2">Swipe to browse services</p>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ── Main component ── */
+
 export default function ServicesSection() {
   const [activeIndex, setActiveIndex] = useState(null)
-  const [phase, setPhase] = useState('idle') // 'idle' | 'collapsing'
+  const [pendingSwitch, setPendingSwitch] = useState(null)
+  const [phase, setPhase] = useState('idle')
+  const [mobileExpandedIndex, setMobileExpandedIndex] = useState(null)
+  const [mobileScrollIndex, setMobileScrollIndex] = useState(0)
   const gridRef = useRef(null)
+  const carouselRef = useRef(null)
   const isExpanded = activeIndex !== null
   const windowWidth = useWindowWidth()
 
   const isMobile = windowWidth < 768
   const isDesktop = windowWidth >= 1024
 
+  // Track carousel scroll position for dot indicators
+  useEffect(() => {
+    if (!isMobile || !carouselRef.current) return
+    const el = carouselRef.current
+    const handleScroll = () => {
+      const cardWidth = el.scrollWidth / services.length
+      const index = Math.round(el.scrollLeft / cardWidth)
+      setMobileScrollIndex(Math.min(index, services.length - 1))
+    }
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [isMobile])
+
+  /* ── Close: two-phase collapse ── */
   const handleClose = useCallback(() => {
-    // Phase 1: fade out content
     setPhase('collapsing')
-    // Phase 2: after content fades, reset grid
     setTimeout(() => {
       setActiveIndex(null)
       setPhase('idle')
     }, 500)
   }, [])
 
+  /* ── Click: open or conveyor-belt switch ── */
   const handleCardClick = useCallback((i) => {
-    if (phase === 'collapsing') return
+    if (phase !== 'idle') return
     if (activeIndex === i) return
-    setActiveIndex(i)
-    setPhase('idle')
+
+    if (activeIndex !== null) {
+      setPendingSwitch(i)
+      setPhase('shuffling')
+      setTimeout(() => {
+        setActiveIndex(i)
+        setPendingSwitch(null)
+        setPhase('idle')
+      }, 700)
+    } else {
+      setActiveIndex(i)
+    }
   }, [activeIndex, phase])
 
   const staggerRef = useRef(null)
@@ -275,16 +460,11 @@ export default function ServicesSection() {
 
   const tileSize = isDesktop ? 72 : 64
 
+  /* ── Grid layout (desktop/tablet only) ── */
   const gridStyle = (() => {
+    if (isMobile) return { display: 'none' }
+
     if (!isExpanded) {
-      if (isMobile) {
-        return {
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gridTemplateRows: 'repeat(6, auto)',
-          gap: '16px',
-        }
-      }
       if (!isDesktop) {
         return {
           display: 'grid',
@@ -301,16 +481,6 @@ export default function ServicesSection() {
       }
     }
 
-    // Expanded state
-    if (isMobile) {
-      return {
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gridTemplateRows: '480px auto',
-        gap: '16px',
-      }
-    }
-
     return {
       display: 'grid',
       gridTemplateColumns: `${tileSize}px 1fr`,
@@ -319,26 +489,26 @@ export default function ServicesSection() {
     }
   })()
 
+  /* ── Per-card grid placement ── */
   const getCardStyle = (i) => {
     if (!isExpanded) return {}
-
-    if (isMobile) {
-      if (i === activeIndex) {
-        return { gridColumn: '1', gridRow: '1' }
-      }
-      return { display: 'none' }
-    }
 
     if (i === activeIndex) {
       return { gridColumn: '2', gridRow: '1 / -1' }
     }
-    const row = getInactiveRow(i, activeIndex)
+
+    const isShuffling = phase === 'shuffling'
+    const row = getTileRow(i, activeIndex, pendingSwitch, isShuffling)
     return { gridColumn: '1', gridRow: `${row + 1}` }
   }
 
-  // Determine content state for each card
+  /* ── Content state per card ── */
   const getContentState = (i) => {
-    if (phase === 'collapsing') return 'fading-out'
+    if (phase === 'collapsing') return 'none'
+    if (phase === 'shuffling') {
+      if (i === activeIndex || i === pendingSwitch) return 'none'
+      return 'tile'
+    }
     if (!isExpanded) return 'default'
     if (i === activeIndex) return 'expanded'
     return 'tile'
@@ -347,28 +517,62 @@ export default function ServicesSection() {
   return (
     <section id="services" className="scroll-mt-16">
       {/* Header + Intro */}
-      <div className="bg-kron-green py-24 px-6">
-        <div className="max-w-6xl mx-auto">
+      <div className="bg-kron-green min-h-screen flex flex-col pt-24 md:pt-32 pb-16 px-5 md:px-6">
+        <div className="max-w-6xl mx-auto w-full">
           <FadeInUp>
             <div className="text-center mb-6">
               <h2 className="font-display text-7xl md:text-8xl font-medium text-white mb-4">Our Services</h2>
-              <p className="text-lg text-white/70">
+              <p className="text-base md:text-lg text-white/70">
                 Comprehensive financial services tailored to your needs
               </p>
             </div>
           </FadeInUp>
 
-          <FadeInUp delay={0.1}>
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <p className="text-lg text-white/70 leading-relaxed">
-                We offer a full range of financial planning services designed to help you achieve
-                your goals. Every recommendation is personal to you and based on a thorough
-                understanding of your circumstances.
-              </p>
+          {/* Mobile: horizontal scroll-snap carousel */}
+          {isMobile && (
+            <div>
+              <div
+                ref={carouselRef}
+                className="mobile-snap-carousel flex gap-4 overflow-x-auto pb-2 -mx-5 px-5"
+                style={{ scrollPaddingLeft: '20px' }}
+              >
+                {services.map((service, i) => (
+                  <motion.div
+                    key={service.title}
+                    className="shrink-0 rounded-2xl bg-white border-l-[3px] border-l-kron-gold/40 border border-kron-sage/20 active:scale-[0.98] transition-transform"
+                    style={{
+                      minWidth: '85vw',
+                      maxWidth: '85vw',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)',
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: i * 0.1 }}
+                    onClick={() => setMobileExpandedIndex(i)}
+                  >
+                    <div className="p-6">
+                      <ServiceIcon icon={service.icon} glow />
+                      <h3 className="text-lg font-bold text-kron-green mt-4 mb-3 tracking-tight">{service.title}</h3>
+                      <div
+                        className="w-8 h-px mb-3"
+                        style={{ background: 'linear-gradient(to right, rgba(185,122,69,0.5), transparent)' }}
+                      />
+                      <p className="text-sm text-kron-brown/80 leading-relaxed">{service.description}</p>
+                      <div className="mt-4 flex items-center gap-1 text-kron-gold text-sm font-medium">
+                        <span>Learn more</span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              <CarouselDots count={services.length} activeIndex={mobileScrollIndex} />
             </div>
-          </FadeInUp>
+          )}
 
-          {/* Service cards */}
+          {/* Desktop/Tablet: existing grid layout */}
           <LayoutGroup>
             <div ref={gridRef}>
               <div ref={staggerRef} style={gridStyle}>
@@ -378,10 +582,45 @@ export default function ServicesSection() {
                   const cardPlacement = getCardStyle(i)
                   const contentState = getContentState(i)
 
-                  if (isMobile && isExpanded && !isActive) return null
-
-                  const tileDelay = isInactive ? getInactiveRow(i, activeIndex) * 0.1 + 0.3 : 0
+                  const isShuffling = phase === 'shuffling'
+                  const tileDelay = isInactive && !isShuffling
+                    ? getTileRow(i, activeIndex, null, false) * 0.1 + 0.3
+                    : 0
                   const defaultStaggerDelay = i * 0.08
+
+                  const cardStyle = (() => {
+                    if (isActive) {
+                      return {
+                        ...cardPlacement,
+                        cursor: 'default',
+                        minHeight: '100%',
+                        boxShadow: '0 8px 40px rgba(185,122,69,0.12), 0 4px 20px rgba(0,0,0,0.08)',
+                      }
+                    }
+                    if (isInactive) {
+                      return {
+                        ...cardPlacement,
+                        cursor: 'pointer',
+                        minHeight: `${tileSize}px`,
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                      }
+                    }
+                    return {
+                      ...cardPlacement,
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)',
+                    }
+                  })()
+
+                  const hoverEffect = (() => {
+                    if (isActive) return undefined
+                    if (isInactive) return { scale: 1.08, transition: { duration: 0.2 } }
+                    return {
+                      y: -6,
+                      boxShadow: '0 8px 30px rgba(185,122,69,0.1), 0 4px 16px rgba(0,0,0,0.06)',
+                      transition: { duration: 0.3 },
+                    }
+                  })()
 
                   return (
                     <motion.div
@@ -395,15 +634,16 @@ export default function ServicesSection() {
                         layout: layoutSpring,
                       }}
                       onClick={() => handleCardClick(i)}
-                      style={{
-                        ...cardPlacement,
-                        cursor: isActive ? 'default' : 'pointer',
-                        minHeight: isActive ? (isMobile ? '480px' : '100%') : isInactive ? `${tileSize}px` : undefined,
-                      }}
-                      className={`relative rounded-2xl border border-kron-sage/30 bg-white ${
-                        !isActive && !isInactive ? 'hover:shadow-lg hover:border-kron-gold/20' : ''
-                      } ${isActive ? 'shadow-lg overflow-hidden' : ''} ${isInactive ? 'hover:border-kron-gold/30 hover:shadow-md overflow-hidden' : ''}`}
-                      whileHover={!isExpanded ? { y: -4, transition: { duration: 0.2 } } : undefined}
+                      style={cardStyle}
+                      className={[
+                        'relative rounded-2xl bg-white',
+                        !isActive && !isInactive
+                          ? 'border-l-[3px] border-l-kron-gold/40 border border-kron-sage/20 hover:border-kron-gold/30 hover:border-l-kron-gold/70'
+                          : '',
+                        isActive ? 'border border-kron-gold/20' : '',
+                        isInactive ? 'border border-kron-sage/25 hover:border-kron-gold/40 overflow-hidden' : '',
+                      ].filter(Boolean).join(' ')}
+                      whileHover={hoverEffect}
                     >
                       <AnimatePresence mode="wait">
                         {contentState === 'expanded' && (
@@ -418,10 +658,10 @@ export default function ServicesSection() {
                             delay={tileDelay}
                           />
                         )}
-                        {(contentState === 'default' || contentState === 'fading-out') && (
+                        {contentState === 'default' && (
                           <DefaultContent
                             service={service}
-                            delay={contentState === 'default' ? defaultStaggerDelay : 0}
+                            delay={defaultStaggerDelay}
                           />
                         )}
                       </AnimatePresence>
@@ -429,39 +669,26 @@ export default function ServicesSection() {
                   )
                 })}
               </div>
-
-              {/* Mobile: horizontal icon row for inactive cards when expanded */}
-              {isMobile && isExpanded && phase !== 'collapsing' && (
-                <motion.div
-                  className="flex flex-row gap-3 justify-center mt-4"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                  {services.map((service, i) => {
-                    if (i === activeIndex) return null
-                    return (
-                      <motion.div
-                        key={service.title}
-                        layout="position"
-                        onClick={() => handleCardClick(i)}
-                        className="flex items-center justify-center rounded-xl border border-kron-sage/30 bg-white hover:border-kron-gold/30 hover:shadow-md transition-all cursor-pointer w-14 h-14"
-                        whileHover={{ scale: 1.1 }}
-                        title={service.title}
-                      >
-                        <ServiceIcon icon={service.icon} size="sm" />
-                      </motion.div>
-                    )
-                  })}
-                </motion.div>
-              )}
             </div>
           </LayoutGroup>
         </div>
       </div>
 
+      {/* Mobile expanded modal */}
+      <AnimatePresence>
+        {mobileExpandedIndex !== null && (
+          <MobileExpandedModal
+            service={services[mobileExpandedIndex]}
+            serviceIndex={mobileExpandedIndex}
+            total={services.length}
+            onClose={() => setMobileExpandedIndex(null)}
+            onNavigate={(idx) => setMobileExpandedIndex(idx)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* CTA */}
-      <div id="goals" className="bg-kron-mist py-24 px-6">
+      <div id="goals" className="bg-kron-mist py-16 px-5 md:py-24 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <FadeInUp>
             <h3 className="text-3xl font-bold text-kron-green mb-6">
@@ -477,7 +704,11 @@ export default function ServicesSection() {
           <FadeInUp delay={0.2}>
             <a
               href="#contact"
-              className="inline-block px-8 py-4 bg-kron-gold text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              className="inline-block px-8 py-4 min-h-[48px] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              style={{
+                background: 'linear-gradient(135deg, #B97A45 0%, #D4A574 100%)',
+                boxShadow: '0 4px 12px rgba(185,122,69,0.3)',
+              }}
             >
               Get in Touch
             </a>

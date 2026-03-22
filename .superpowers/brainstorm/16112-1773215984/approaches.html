@@ -1,0 +1,90 @@
+<h2>Scroll-Triggered Curved Path: Implementation Approaches</h2>
+<p class="subtitle">A gold gradient ribbon that draws itself between sections (About → Approach → Services → Contact) as you scroll</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>SVG Path + stroke-dashoffset (Recommended)</h3>
+      <p><strong>How:</strong> A single full-page SVG overlay with a cubic Bezier curve. Uses <code>motion/react</code>'s <code>useScroll</code> + <code>useTransform</code> to map scroll progress to <code>stroke-dashoffset</code>, creating a draw-on reveal.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Smooth, precise scroll-linked animation (no jank)</li>
+            <li>Already proven in your Approach section's river-path</li>
+            <li>Uses existing <code>motion/react</code> library — no new deps</li>
+            <li>SVG gradient ribbon via <code>linearGradient</code> + wider stroke</li>
+            <li>Fully responsive — path recalculated on resize</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Path coordinates need calculation relative to section positions</li>
+            <li>Full-page SVG overlay needs careful z-indexing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>CSS Scroll-Driven Animations</h3>
+      <p><strong>How:</strong> Uses native CSS <code>animation-timeline: scroll()</code> to animate an SVG path's dashoffset without any JavaScript. Pure CSS approach.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Zero JavaScript — purely declarative</li>
+            <li>Native browser performance</li>
+            <li>No library dependency</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Limited browser support (no Firefox/Safari stable)</li>
+            <li>Inconsistent with existing motion/react patterns</li>
+            <li>Harder to coordinate with section positions dynamically</li>
+            <li>Less control over easing and intermediate states</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Canvas 2D Rendering</h3>
+      <p><strong>How:</strong> A full-page <code>&lt;canvas&gt;</code> element that redraws a gold curve on each scroll frame using <code>requestAnimationFrame</code>.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Maximum rendering control</li>
+            <li>Can add complex particle effects easily</li>
+            <li>Good for very complex animations</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Overkill for a single curved path</li>
+            <li>Not SEO/accessibility friendly</li>
+            <li>Doesn't match existing SVG/motion patterns</li>
+            <li>Higher battery/CPU usage on mobile</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1.5rem; border: 1px solid rgba(185, 122, 69, 0.3); border-radius: 12px; background: rgba(185, 122, 69, 0.05);">
+  <h3 style="color: #B97A45;">My Recommendation: Approach A</h3>
+  <p>SVG + stroke-dashoffset with <code>motion/react</code> is the natural fit. It reuses your existing animation infrastructure, is well-supported across browsers, and creates exactly the draw-on effect you want. The gradient ribbon effect is achieved with SVG's <code>&lt;linearGradient&gt;</code> applied to the stroke, with a wider stroke-width (~10-15px).</p>
+</div>
