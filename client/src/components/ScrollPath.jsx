@@ -45,14 +45,14 @@ function buildSegments(vw) {
     const midY = (curr.bottom + next.top) / 2
     const goRight = i % 2 === 0
 
-    const farX = goRight ? vw * 1.08 : vw * -0.08
-    const nearX = goRight ? vw * -0.04 : vw * 1.04
+    const farX = goRight ? vw * 1.05 : vw * -0.05
+    const nearX = goRight ? vw * -0.02 : vw * 1.02
 
     points.push({ x: farX, y: curr.bottom - curr.height * 0.1 })
     points.push({ x: farX, y: midY })
     points.push({ x: nearX, y: next.top + next.height * 0.15 })
     points.push({
-      x: vw * (goRight ? 0.3 : 0.7),
+      x: vw * (goRight ? 0.05 : 0.95),
       y: next.top + next.height * 0.35,
     })
   }
@@ -152,6 +152,47 @@ function measurePathLength(segments) {
   return len
 }
 
+/**
+ * Sample the path at regular intervals to build a Y → cumulative-length lookup.
+ */
+function buildYToLengthMap(segments, totalLength) {
+  const ns = 'http://www.w3.org/2000/svg'
+  const svg = document.createElementNS(ns, 'svg')
+  svg.setAttribute('width', '0')
+  svg.setAttribute('height', '0')
+  svg.style.position = 'absolute'
+  svg.style.visibility = 'hidden'
+
+  const path = document.createElementNS(ns, 'path')
+  path.setAttribute('d', segmentsToD(segments, 0))
+  path.setAttribute('fill', 'none')
+  svg.appendChild(path)
+  document.body.appendChild(svg)
+
+  const steps = 500
+  const map = []
+  for (let i = 0; i <= steps; i++) {
+    const len = (i / steps) * totalLength
+    const pt = path.getPointAtLength(len)
+    map.push({ y: pt.y, len })
+  }
+
+  document.body.removeChild(svg)
+  return map
+}
+
+/**
+ * Find the path length corresponding to a given document Y position.
+ * Scans forward, returning the max length where y <= targetY.
+ */
+function yToLength(map, targetY) {
+  let bestLen = 0
+  for (let i = 0; i < map.length; i++) {
+    if (map[i].y <= targetY) bestLen = map[i].len
+  }
+  return bestLen
+}
+
 const mobileQuery = typeof window !== 'undefined'
   ? window.matchMedia('(max-width: 479px)')
   : null
@@ -190,6 +231,7 @@ export default function ScrollPath() {
     data.segments = segments
     data.docHeight = document.documentElement.scrollHeight
     data.pathLength = measurePathLength(segments)
+    data.yToLenMap = buildYToLengthMap(segments, data.pathLength)
 
     if (containerRef.current) {
       containerRef.current.style.display = ''
@@ -198,12 +240,15 @@ export default function ScrollPath() {
     // Set initial path state
     const scrollY = window.scrollY
     const d = segmentsToD(segments, scrollY)
+    const midpointY = scrollY + window.innerHeight / 2
+    const revealLen = yToLength(data.yToLenMap, midpointY)
+    const initialOffset = data.pathLength - revealLen
 
     for (const ref of [mainPathRef, outerGlowRef, innerGlowRef]) {
       if (ref.current) {
         ref.current.setAttribute('d', d)
         ref.current.style.strokeDasharray = data.pathLength
-        ref.current.style.strokeDashoffset = data.pathLength
+        ref.current.style.strokeDashoffset = initialOffset
       }
     }
   }, [])
@@ -238,6 +283,8 @@ export default function ScrollPath() {
     if (!data.segments || !data.pathLength || data.isMobile) return
 
     const scrollY = window.scrollY
+    const vh = window.innerHeight
+    const midpointY = scrollY + vh / 2
 
     // Fade in
     const opacity = progress < 0.03 ? 0
@@ -250,9 +297,11 @@ export default function ScrollPath() {
     // Translate path into viewport coordinates
     const d = segmentsToD(data.segments, scrollY)
 
-    // Dash offset: draw from 5% to 95% scroll
-    const drawProgress = Math.min(1, Math.max(0, (progress - 0.05) / 0.9))
-    const offset = data.pathLength * (1 - drawProgress)
+    // Reveal path up to the viewport midpoint
+    const revealLen = data.yToLenMap
+      ? yToLength(data.yToLenMap, midpointY)
+      : 0
+    const offset = data.pathLength - revealLen
 
     for (const ref of [mainPathRef, outerGlowRef, innerGlowRef]) {
       if (ref.current) {
