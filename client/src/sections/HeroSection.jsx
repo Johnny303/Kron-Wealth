@@ -28,19 +28,21 @@ export default function HeroSection() {
       {/* Full-width grid layout */}
       <div className="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_2fr]">
         {/* Left: Animated Hourglass — 40vh on mobile for more text room */}
-        <motion.div
-          className="relative overflow-hidden h-[40vh] lg:h-auto order-1"
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        >
-          <AnimatedHourglass className="mix-blend-lighten" />
+        <div className="relative overflow-hidden h-[40vh] lg:h-auto order-1 -translate-z-0 backface-hidden">
+          <motion.div
+            className="w-full h-full"
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <AnimatedHourglass className="mix-blend-lighten" />
+          </motion.div>
 
-          {/* Gradient overlays for seamless blending */}
+          {/* Gradient overlays for seamless blending — outside animated div so they always cover the edges */}
           <div className="absolute inset-0 bg-gradient-to-l from-kron-green via-kron-green/40 to-transparent to-60%" />
           <div className="absolute inset-0 bg-gradient-to-b from-kron-green to-transparent to-20%" />
           <div className="absolute inset-0 bg-gradient-to-t from-kron-green to-transparent to-20%" />
-        </motion.div>
+        </div>
 
         {/* Right: Text content — mobile gets px-5, no parallax transforms */}
         <motion.div
