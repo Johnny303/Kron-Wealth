@@ -25,8 +25,18 @@ export default function HeroSection() {
         style={{ y: bgY2 }}
       />
 
+      {/* Top gradient overlay — blends top edge with #10312C above, never touches text */}
+      <div
+        className="absolute top-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: '180px',
+          background: 'linear-gradient(to bottom, #10312C 0%, rgba(16, 49, 44, 0) 100%)',
+          zIndex: 5,
+        }}
+      />
+
       {/* Full-width grid layout */}
-      <div className="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_2fr]">
+      <div className="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-[45%_55%]">
         {/* Left: Animated Hourglass — 40vh on mobile for more text room */}
         <div className="relative overflow-hidden h-[40vh] lg:h-auto order-1 -translate-z-0 backface-hidden">
           <motion.div
@@ -39,14 +49,14 @@ export default function HeroSection() {
           </motion.div>
 
           {/* Gradient overlays for seamless blending — outside animated div so they always cover the edges */}
-          <div className="absolute inset-0 bg-gradient-to-l from-kron-green via-kron-green/40 to-transparent to-60%" />
-          <div className="absolute inset-0 bg-gradient-to-b from-kron-green to-transparent to-20%" />
+          <div className="absolute inset-0 bg-gradient-to-l from-kron-green from-5% via-kron-green/50 via-30% to-transparent to-55%" />
+          <div className="absolute inset-0 bg-gradient-to-b from-kron-green/70 from-5% via-kron-green/20 via-20% to-transparent to-45%" />
           <div className="absolute inset-0 bg-gradient-to-t from-kron-green to-transparent to-20%" />
         </div>
 
         {/* Right: Text content — mobile gets px-5, no parallax transforms */}
         <motion.div
-          className="text-center lg:text-left order-2 flex flex-col justify-center gap-6 md:gap-8 px-5 md:px-6 lg:px-16 py-8 md:py-12 lg:py-0"
+          className="text-center lg:text-left order-2 flex flex-col justify-center gap-6 md:gap-8 px-5 md:px-6 lg:pl-[24px] lg:pr-16 py-8 md:py-12 lg:py-0 lg:-ml-[100px] relative z-20"
           style={{ y: textY, opacity: textOpacity }}
         >
           <motion.h1

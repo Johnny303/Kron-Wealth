@@ -37,7 +37,7 @@ function buildSegments(vw) {
   const last = sections[sections.length - 1]
   const endY = last.bottom - 40
 
-  const points = [{ x: vw * 0.5, y: startY }]
+  const points = [{ x: vw * 0.92, y: startY }]
 
   for (let i = 0; i < sections.length - 1; i++) {
     const curr = sections[i]
@@ -358,31 +358,43 @@ export default function ScrollPath() {
             <stop offset="65%" stopColor="#C4903A" />
             <stop offset="100%" stopColor="#8B5E30" />
           </linearGradient>
+
+          {/* Tight bloom around the core line */}
+          <filter id="glow-inner" x="-500%" y="-500%" width="1100%" height="1100%">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
+
+          {/* Wide atmospheric haze — barely perceptible */}
+          <filter id="glow-outer" x="-500%" y="-500%" width="1100%" height="1100%">
+            <feGaussianBlur stdDeviation="12" />
+          </filter>
         </defs>
 
-        {/* Outer glow — wide, very faint */}
+        {/* Outer glow — blurred haze, whisper opacity */}
         <path
           ref={outerGlowRef}
-          stroke="rgba(185, 122, 69, 0.03)"
-          strokeWidth={36}
+          stroke="rgba(201, 168, 76, 0.07)"
+          strokeWidth={10}
           strokeLinecap="round"
           fill="none"
+          filter="url(#glow-outer)"
         />
 
-        {/* Inner glow — medium width, slightly stronger */}
+        {/* Inner glow — tight bloom, very low opacity */}
         <path
           ref={innerGlowRef}
-          stroke="rgba(185, 122, 69, 0.08)"
-          strokeWidth={18}
+          stroke="rgba(212, 160, 86, 0.14)"
+          strokeWidth={5}
           strokeLinecap="round"
           fill="none"
+          filter="url(#glow-inner)"
         />
 
         {/* Main gold ribbon */}
         <path
           ref={mainPathRef}
           stroke="url(#kron-path-gradient)"
-          strokeWidth={5}
+          strokeWidth={1.5}
           strokeLinecap="round"
           fill="none"
         />
