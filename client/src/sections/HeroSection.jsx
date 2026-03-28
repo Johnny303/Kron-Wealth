@@ -56,7 +56,7 @@ export default function HeroSection() {
 
         {/* Right: Text content — mobile gets px-5, no parallax transforms */}
         <motion.div
-          className="text-center lg:text-left order-2 flex flex-col justify-center gap-6 md:gap-8 px-5 md:px-6 lg:pl-[24px] lg:pr-16 py-8 md:py-12 lg:py-0 lg:-ml-[100px] relative z-20"
+          className="text-center lg:text-left order-2 flex flex-col justify-center gap-6 md:gap-8 px-5 md:px-6 lg:pl-[24px] lg:pr-16 py-8 md:py-12 lg:py-0 lg:-ml-[14vw] relative z-20"
           style={{ y: textY, opacity: textOpacity }}
         >
           <motion.h1
@@ -74,7 +74,7 @@ export default function HeroSection() {
               Strategic Financial
             </motion.span>
             <motion.span
-              className="block text-kron-gold"
+              className="block text-kron-gold lg:pl-10"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -82,7 +82,7 @@ export default function HeroSection() {
               Consultancy
             </motion.span>
             <motion.span
-              className="block"
+              className="block lg:pl-20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}

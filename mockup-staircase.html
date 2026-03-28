@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hero Mockup — Staircase Indent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #10312C;
+      font-family: Georgia, serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: #10312C;
+      overflow: hidden;
+    }
+
+    .accent {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top right, rgba(185,122,69,0.15), transparent 50%);
+      pointer-events: none;
+    }
+
+    .top-fade {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, #10312C 0%, rgba(16,49,44,0) 100%);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .grid {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 45% 55%;
+    }
+
+    .hourglass-col {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hourglass-placeholder {
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(ellipse 55% 80% at 50% 50%, rgba(185,122,69,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 60% at 40% 30%, rgba(193,204,197,0.08) 0%, transparent 60%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hourglass-placeholder svg {
+      width: 200px;
+      height: 300px;
+      opacity: 0.18;
+    }
+
+    .hourglass-col::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to left,  #10312C 5%, rgba(16,49,44,0.5) 30%, transparent 55%),
+        linear-gradient(to bottom, rgba(16,49,44,0.7) 5%, rgba(16,49,44,0.2) 20%, transparent 45%),
+        linear-gradient(to top,    #10312C 0%, transparent 20%);
+    }
+
+    /* Right: text content — same baseline position as current site (-100px) */
+    .text-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0 4rem 0 24px;
+      margin-left: -100px;
+      position: relative;
+      z-index: 20;
+    }
+
+    h1 {
+      font-size: clamp(2.25rem, 6vw, 4rem);
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.15;
+      font-family: Georgia, serif;
+    }
+
+    /* Staircase: each line steps right by a fixed amount */
+    .line-1 { display: block; padding-left: 0;      } /* baseline */
+    .line-2 { display: block; padding-left: 2.5rem; } /* +2.5rem  */
+    .line-3 { display: block; padding-left: 5rem;   } /* +5rem    */
+    .gold   { color: #B97A45; }
+
+    p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.68);
+      max-width: 520px;
+      line-height: 1.7;
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 300;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      padding: 1rem 2rem;
+      background: #B97A45;
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+    }
+
+    .btn-outline {
+      padding: 1rem 2rem;
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 9999px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+    }
+
+    .label {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: rgba(185,122,69,0.85);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-family: Arial, sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* Step guides — faint vertical lines showing indent levels */
+    .step-guide {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(185,122,69,0.15);
+      z-index: 30;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="accent"></div>
+    <div class="top-fade"></div>
+
+    <div class="grid">
+      <div class="hourglass-col">
+        <div class="hourglass-placeholder">
+          <svg viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 5 L90 5 L55 75 L90 145 L10 145 L45 75 Z" fill="white"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="text-col">
+        <h1>
+          <span class="line-1">Strategic Financial</span>
+          <span class="line-2 gold">Consultancy</span>
+          <span class="line-3">&amp; Wealth Management</span>
+        </h1>
+
+        <p>Helping you make the most of your time and money through personalised financial planning and expert guidance.</p>
+
+        <div class="buttons">
+          <button class="btn-gold">Learn About Us</button>
+          <button class="btn-outline">Get in Touch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="label">Option 2 — Staircase Indent (+2.5rem per line)</div>
+</body>
+</html>

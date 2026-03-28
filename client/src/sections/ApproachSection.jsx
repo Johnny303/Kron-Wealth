@@ -288,9 +288,9 @@ export default function ApproachSection() {
                     to { opacity: 0; }
                   }
                   @keyframes dotBlink {
-                    0% { box-shadow: 0 0 0 0 rgba(240, 194, 122, 0); }
-                    50% { box-shadow: 0 0 24px 10px rgba(240, 194, 122, 0.9); }
-                    100% { box-shadow: 0 0 0 0 rgba(240, 194, 122, 0); }
+                    0% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0); }
+                    50% { box-shadow: 0 0 24px 10px rgba(224, 176, 122, 0.7); }
+                    100% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0); }
                   }
                   @keyframes cornerDraw {
                     from { clip-path: inset(0 100% 100% 0); }
@@ -335,24 +335,21 @@ export default function ApproachSection() {
                     <div
                       ref={el => { cardRefs.current[i] = el }}
                       className={`relative w-64 overflow-hidden backdrop-blur-sm border rounded-xl cursor-default
-                        pt-6 px-6 ${
-                          isHovered
-                            ? 'border-kron-gold pb-6'
-                            : 'bg-white/10 border-white/20 pb-6'
-                        }`}
+                        pt-6 px-6 pb-6 ${!isHovered ? 'bg-white/10' : ''}`}
                       style={{
                         transition: [
                           `box-shadow ${isHovered ? '800ms' : '400ms'} cubic-bezier(0.4, 0, 0.2, 1)`,
                           `border-color ${isHovered ? '600ms' : '200ms'} ease-out`,
                           `background-color ${isHovered ? '1500ms' : '300ms'} ease`,
                         ].join(', '),
+                        borderColor: isHovered ? 'rgba(185,122,69,0.25)' : 'rgba(255,255,255,0.2)',
                         boxShadow: isHovered
                           ? [
-                              '0 2px 6px rgba(185, 122, 69, 0.45)',
-                              '0 12px 32px rgba(185, 122, 69, 0.2)',
+                              '0 2px 6px rgba(185, 122, 69, 0.15)',
+                              '0 12px 32px rgba(185, 122, 69, 0.1)',
                               '0 24px 64px rgba(0, 0, 0, 0.5)',
                               'inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-                              'inset 0 -1px 0 rgba(185, 122, 69, 0.1)',
+                              'inset 0 -1px 0 rgba(185, 122, 69, 0.08)',
                             ].join(', ')
                           : '0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)',
                       }}
@@ -365,9 +362,9 @@ export default function ApproachSection() {
                           transition: 'opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1)',
                           zIndex: 0,
                           background: [
-                            'radial-gradient(ellipse 80% 60% at 20% 10%, rgba(240, 194, 122, 0.12) 0%, transparent 60%)',
-                            'radial-gradient(ellipse 60% 80% at 85% 80%, rgba(185, 122, 69, 0.08) 0%, transparent 50%)',
-                            'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 70%)',
+                            'radial-gradient(ellipse 80% 60% at 20% 10%, rgba(224, 176, 122, 0.08) 0%, transparent 60%)',
+                            'radial-gradient(ellipse 60% 80% at 85% 80%, rgba(185, 122, 69, 0.05) 0%, transparent 50%)',
+                            'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 70%)',
                           ].join(', '),
                         }}
                       />
@@ -393,8 +390,8 @@ export default function ApproachSection() {
                           left: 0,
                           width: 28,
                           height: 28,
-                          borderTop: '2px solid #F0C27A',
-                          borderLeft: '2px solid #F0C27A',
+                          borderTop: '2px solid #e0b07a',
+                          borderLeft: '2px solid #e0b07a',
                           borderTopLeftRadius: 12,
                           opacity: isHovered ? 1 : 0,
                           animation: isHovered ? 'cornerDraw 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards' : 'none',
@@ -409,8 +406,8 @@ export default function ApproachSection() {
                           right: 0,
                           width: 28,
                           height: 28,
-                          borderBottom: '2px solid #F0C27A',
-                          borderRight: '2px solid #F0C27A',
+                          borderBottom: '2px solid #e0b07a',
+                          borderRight: '2px solid #e0b07a',
                           borderBottomRightRadius: 12,
                           opacity: isHovered ? 1 : 0,
                           animation: isHovered ? 'cornerDrawBR 500ms cubic-bezier(0.22, 1, 0.36, 1) 150ms forwards' : 'none',
@@ -420,11 +417,12 @@ export default function ApproachSection() {
 
                       {/* Ripple — expands from dot position to fill the card */}
                       <div
-                        className="absolute rounded-full bg-kron-gold pointer-events-none"
+                        className="absolute rounded-full pointer-events-none"
                         style={{
                           width: '16px',
                           height: '16px',
                           left: '50%',
+                          backgroundColor: 'rgba(185,122,69,0.55)',
                           bottom: isHovered ? '3.5rem' : '1.25rem',
                           transform: isHovered
                             ? 'translate(-50%, 50%) scale(60)'
@@ -457,7 +455,7 @@ export default function ApproachSection() {
                             height: 1.5,
                             width: '60%',
                             marginTop: 4,
-                            background: 'linear-gradient(90deg, transparent, #F0C27A, transparent)',
+                            background: 'linear-gradient(90deg, transparent, #e0b07a, transparent)',
                             transform: isHovered ? 'scaleX(1)' : 'scaleX(0)',
                             transition: `transform ${isHovered ? '800ms' : '200ms'} cubic-bezier(0.22, 1, 0.36, 1) ${isHovered ? '600ms' : '0ms'}`,
                             transformOrigin: 'center',
@@ -484,11 +482,11 @@ export default function ApproachSection() {
                       {/* Dot — inside card, under text */}
                       <div
                         ref={el => dotRefs.current[i] = el}
-                        className={`relative mx-auto mt-3 rounded-full bg-kron-gold transition-all duration-300 ${
-                          isHovered ? 'w-6 h-6' : 'w-3 h-3'
-                        }`}
+                        className="relative mx-auto mt-3 rounded-full w-3 h-3"
                         style={{
-                          transition: 'all 300ms',
+                          backgroundColor: '#e0b07a',
+                          opacity: isHovered ? 0 : 1,
+                          transition: 'opacity 400ms ease-out',
                           zIndex: 1,
                           ...(hasEntered ? {
                             animation: `dotBlink 750ms ease-in-out ${i * 900}ms`,
