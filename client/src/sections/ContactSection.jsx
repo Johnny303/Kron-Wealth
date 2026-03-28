@@ -4,6 +4,7 @@ import { FadeInUp, SlideInLeft, SlideInRight } from '../components/ScrollAnimati
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [status, setStatus] = useState('idle') // idle | sending | success
+  const [submitHovered, setSubmitHovered] = useState(false)
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -179,11 +180,16 @@ export default function ContactSection() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="w-full px-8 py-4 min-h-[52px] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="w-full px-8 py-4 min-h-[52px] font-semibold rounded-lg disabled:opacity-50"
                 style={{
-                  background: 'linear-gradient(135deg, #B97A45 0%, #D4A574 100%)',
-                  boxShadow: '0 2px 8px rgba(185,122,69,0.3)',
+                  background: submitHovered ? 'rgba(185,122,69,0.22)' : 'rgba(185,122,69,0.15)',
+                  border: submitHovered ? '1px solid rgba(185,122,69,0.50)' : '1px solid rgba(185,122,69,0.35)',
+                  color: '#e0b07a',
+                  boxShadow: submitHovered ? '0 0 12px rgba(185,122,69,0.15)' : 'none',
+                  transition: 'all 0.2s ease',
                 }}
+                onMouseEnter={() => setSubmitHovered(true)}
+                onMouseLeave={() => setSubmitHovered(false)}
               >
                 {status === 'sending' ? 'Sending...' : 'Send Message'}
               </button>

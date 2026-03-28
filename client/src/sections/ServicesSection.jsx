@@ -156,6 +156,7 @@ function ServiceIcon({ icon, size = 'md', glow = false }) {
 }
 
 function ExpandedContent({ service, onClose }) {
+  const [getStartedHovered, setGetStartedHovered] = useState(false)
   return (
     <motion.div
       key="expanded"
@@ -220,11 +221,16 @@ function ExpandedContent({ service, onClose }) {
         <a
           href="#contact"
           onClick={(e) => e.stopPropagation()}
-          className="inline-block text-center px-7 py-3 min-h-[48px] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm tracking-wide uppercase"
+          className="inline-block text-center px-7 py-3 min-h-[48px] font-semibold rounded-lg text-sm tracking-wide uppercase"
           style={{
-            background: 'linear-gradient(135deg, #B97A45 0%, #D4A574 100%)',
-            boxShadow: '0 2px 8px rgba(185,122,69,0.3)',
+            background: getStartedHovered ? 'rgba(185,122,69,0.22)' : 'rgba(185,122,69,0.15)',
+            border: getStartedHovered ? '1px solid rgba(185,122,69,0.50)' : '1px solid rgba(185,122,69,0.35)',
+            color: '#e0b07a',
+            boxShadow: getStartedHovered ? '0 0 12px rgba(185,122,69,0.15)' : 'none',
+            transition: 'all 0.2s ease',
           }}
+          onMouseEnter={() => setGetStartedHovered(true)}
+          onMouseLeave={() => setGetStartedHovered(false)}
         >
           Get Started
         </a>
@@ -233,7 +239,7 @@ function ExpandedContent({ service, onClose }) {
   )
 }
 
-function TileContent({ service, delay = 0 }) {
+function TileContent({ service, delay = 0, isHovered = false }) {
   return (
     <motion.div
       key="tile"
@@ -241,9 +247,44 @@ function TileContent({ service, delay = 0 }) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{ duration: 0.5, delay }}
-      className="w-full h-full flex items-center justify-center"
+      className="relative w-full h-full"
     >
-      <ServiceIcon icon={service.icon} size="sm" />
+      {/* Small centered icon — fades out on hover */}
+      <motion.div
+        animate={{ opacity: isHovered ? 0 : 1 }}
+        transition={{ duration: 0.2 }}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <ServiceIcon icon={service.icon} size="sm" />
+      </motion.div>
+
+      {/* Large ghost icon — fills tile, fades in on hover */}
+      <motion.div
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.25 }}
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <svg
+          className="w-full h-full p-3 text-kron-green/[0.07]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth={1}
+        >
+          {service.icon}
+        </svg>
+      </motion.div>
+
+      {/* Text overlay — centered, on top */}
+      <motion.div
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.2, delay: isHovered ? 0.06 : 0 }}
+        className="absolute inset-0 flex items-center justify-center px-1 z-10"
+      >
+        <p className="font-serif text-[9.4px] tracking-wide text-kron-gold font-semibold text-center leading-tight">
+          {service.title}
+        </p>
+      </motion.div>
     </motion.div>
   )
 }
@@ -288,6 +329,7 @@ function CarouselDots({ count, activeIndex }) {
 
 /* ── Mobile expanded modal ── */
 function MobileExpandedModal({ service, serviceIndex, onClose, onNavigate, total }) {
+  const [getStartedHovered, setGetStartedHovered] = useState(false)
   // Lock body scroll
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -363,11 +405,16 @@ function MobileExpandedModal({ service, serviceIndex, onClose, onNavigate, total
         <a
           href="#contact"
           onClick={onClose}
-          className="block text-center px-7 py-4 min-h-[52px] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity text-sm tracking-wide uppercase"
+          className="block text-center px-7 py-4 min-h-[52px] font-semibold rounded-xl text-sm tracking-wide uppercase"
           style={{
-            background: 'linear-gradient(135deg, #B97A45 0%, #D4A574 100%)',
-            boxShadow: '0 2px 8px rgba(185,122,69,0.3)',
+            background: getStartedHovered ? 'rgba(185,122,69,0.22)' : 'rgba(185,122,69,0.15)',
+            border: getStartedHovered ? '1px solid rgba(185,122,69,0.50)' : '1px solid rgba(185,122,69,0.35)',
+            color: '#e0b07a',
+            boxShadow: getStartedHovered ? '0 0 12px rgba(185,122,69,0.15)' : 'none',
+            transition: 'all 0.2s ease',
           }}
+          onMouseEnter={() => setGetStartedHovered(true)}
+          onMouseLeave={() => setGetStartedHovered(false)}
         >
           Get Started
         </a>
@@ -385,6 +432,8 @@ export default function ServicesSection() {
   const [phase, setPhase] = useState('idle')
   const [mobileExpandedIndex, setMobileExpandedIndex] = useState(null)
   const [mobileScrollIndex, setMobileScrollIndex] = useState(0)
+  const [hoveredTileIndex, setHoveredTileIndex] = useState(null)
+  const [getInTouchHovered, setGetInTouchHovered] = useState(false)
   const gridRef = useRef(null)
   const carouselRef = useRef(null)
   const isExpanded = activeIndex !== null
@@ -603,6 +652,7 @@ export default function ServicesSection() {
                         cursor: 'pointer',
                         minHeight: `${tileSize}px`,
                         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                        zIndex: hoveredTileIndex === i ? 20 : 1,
                       }
                     }
                     return {
@@ -614,7 +664,7 @@ export default function ServicesSection() {
 
                   const hoverEffect = (() => {
                     if (isActive) return undefined
-                    if (isInactive) return { scale: 1.08, transition: { duration: 0.2 } }
+                    if (isInactive) return { scale: 1.5, boxShadow: '0 4px 16px rgba(185,122,69,0.2), 0 0 0 1px rgba(185,122,69,0.25)', transition: { duration: 0.2 } }
                     return {
                       y: -6,
                       boxShadow: '0 8px 30px rgba(185,122,69,0.1), 0 4px 16px rgba(0,0,0,0.06)',
@@ -634,6 +684,8 @@ export default function ServicesSection() {
                         layout: layoutSpring,
                       }}
                       onClick={() => handleCardClick(i)}
+                      onHoverStart={() => isInactive && setHoveredTileIndex(i)}
+                      onHoverEnd={() => isInactive && setHoveredTileIndex(null)}
                       style={cardStyle}
                       className={[
                         'relative rounded-2xl bg-white',
@@ -656,6 +708,7 @@ export default function ServicesSection() {
                           <TileContent
                             service={service}
                             delay={tileDelay}
+                            isHovered={hoveredTileIndex === i}
                           />
                         )}
                         {contentState === 'default' && (
@@ -704,11 +757,16 @@ export default function ServicesSection() {
           <FadeInUp delay={0.2}>
             <a
               href="#contact"
-              className="inline-block px-8 py-4 min-h-[48px] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+              className="inline-block px-8 py-4 min-h-[48px] font-semibold rounded-lg"
               style={{
-                background: 'linear-gradient(135deg, #B97A45 0%, #D4A574 100%)',
-                boxShadow: '0 4px 12px rgba(185,122,69,0.3)',
+                background: getInTouchHovered ? 'rgba(185,122,69,0.22)' : 'rgba(185,122,69,0.15)',
+                border: getInTouchHovered ? '1px solid rgba(185,122,69,0.50)' : '1px solid rgba(185,122,69,0.35)',
+                color: '#e0b07a',
+                boxShadow: getInTouchHovered ? '0 0 12px rgba(185,122,69,0.15)' : 'none',
+                transition: 'all 0.2s ease',
               }}
+              onMouseEnter={() => setGetInTouchHovered(true)}
+              onMouseLeave={() => setGetInTouchHovered(false)}
             >
               Get in Touch
             </a>

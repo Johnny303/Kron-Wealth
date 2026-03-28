@@ -120,7 +120,7 @@ export default function Navbar() {
               <img
                 src={`${import.meta.env.BASE_URL}images/kron-signature.png`}
                 alt="Kron Wealth"
-                className="h-15 w-auto brightness-[1.8]"
+                className="h-[70px] w-auto brightness-[1.8]"
               />
             </a>
           ) : (
@@ -128,7 +128,7 @@ export default function Navbar() {
               <img
                 src={`${import.meta.env.BASE_URL}images/kron-signature.png`}
                 alt="Kron Wealth"
-                className="h-15 w-auto brightness-[1.8]"
+                className="h-[70px] w-auto brightness-[1.8]"
               />
             </Link>
           )}

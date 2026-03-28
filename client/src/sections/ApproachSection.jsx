@@ -160,11 +160,11 @@ export default function ApproachSection() {
     return () => frames.forEach(cancelAnimationFrame)
   }, [hoveredIndex, hasEntered, updateLines])
 
-  // Sequence: gold bg first (1500ms), then show text
+  // Sequence: gold bg first (1000ms), then show text
   useEffect(() => {
     if (hoveredIndex !== null) {
       setShowText(false)
-      const timer = setTimeout(() => setShowText(true), 1500)
+      const timer = setTimeout(() => setShowText(true), 1000)
       return () => clearTimeout(timer)
     } else {
       setShowText(false)
@@ -326,7 +326,7 @@ export default function ApproachSection() {
                       transform: 'translate(-50%, -50%)',
                       zIndex: isHovered ? 10 : 2,
                       filter: isRevealed ? 'blur(0px)' : 'blur(6px)',
-                      transition: 'filter 600ms ease-out, opacity 300ms',
+                      transition: 'filter 400ms ease-out, opacity 200ms',
                     }}
                     onMouseEnter={() => setHoveredIndex(i)}
                     onMouseLeave={() => setHoveredIndex(null)}
@@ -338,9 +338,9 @@ export default function ApproachSection() {
                         pt-6 px-6 pb-6 ${!isHovered ? 'bg-white/10' : ''}`}
                       style={{
                         transition: [
-                          `box-shadow ${isHovered ? '800ms' : '400ms'} cubic-bezier(0.4, 0, 0.2, 1)`,
-                          `border-color ${isHovered ? '600ms' : '200ms'} ease-out`,
-                          `background-color ${isHovered ? '1500ms' : '300ms'} ease`,
+                          `box-shadow ${isHovered ? '533ms' : '267ms'} cubic-bezier(0.4, 0, 0.2, 1)`,
+                          `border-color ${isHovered ? '400ms' : '133ms'} ease-out`,
+                          `background-color ${isHovered ? '1000ms' : '200ms'} ease`,
                         ].join(', '),
                         borderColor: isHovered ? 'rgba(185,122,69,0.25)' : 'rgba(255,255,255,0.2)',
                         boxShadow: isHovered
@@ -359,7 +359,7 @@ export default function ApproachSection() {
                         className="absolute inset-0 rounded-xl pointer-events-none"
                         style={{
                           opacity: isHovered ? 1 : 0,
-                          transition: 'opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1)',
+                          transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1)',
                           zIndex: 0,
                           background: [
                             'radial-gradient(ellipse 80% 60% at 20% 10%, rgba(224, 176, 122, 0.08) 0%, transparent 60%)',
@@ -371,7 +371,7 @@ export default function ApproachSection() {
                       {/* Noise grain overlay */}
                       <svg className="absolute inset-0 w-full h-full rounded-xl pointer-events-none" style={{
                         opacity: isHovered ? 0.06 : 0,
-                        transition: 'opacity 1400ms ease',
+                        transition: 'opacity 933ms ease',
                         zIndex: 0,
                         mixBlendMode: 'overlay',
                       }}>
@@ -394,7 +394,7 @@ export default function ApproachSection() {
                           borderLeft: '2px solid #e0b07a',
                           borderTopLeftRadius: 12,
                           opacity: isHovered ? 1 : 0,
-                          animation: isHovered ? 'cornerDraw 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards' : 'none',
+                          animation: isHovered ? 'cornerDraw 333ms cubic-bezier(0.22, 1, 0.36, 1) forwards' : 'none',
                           zIndex: 3,
                         }}
                       />
@@ -410,7 +410,7 @@ export default function ApproachSection() {
                           borderRight: '2px solid #e0b07a',
                           borderBottomRightRadius: 12,
                           opacity: isHovered ? 1 : 0,
-                          animation: isHovered ? 'cornerDrawBR 500ms cubic-bezier(0.22, 1, 0.36, 1) 150ms forwards' : 'none',
+                          animation: isHovered ? 'cornerDrawBR 333ms cubic-bezier(0.22, 1, 0.36, 1) 100ms forwards' : 'none',
                           zIndex: 3,
                         }}
                       />
@@ -428,8 +428,8 @@ export default function ApproachSection() {
                             ? 'translate(-50%, 50%) scale(60)'
                             : 'translate(-50%, 50%) scale(0)',
                           transition: isHovered
-                            ? 'transform 3000ms cubic-bezier(0.25, 0.46, 0.45, 0.94), bottom 3000ms ease'
-                            : 'transform 800ms ease-in, bottom 600ms ease',
+                            ? 'transform 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94), bottom 2000ms ease'
+                            : 'transform 533ms ease-in, bottom 400ms ease',
                           zIndex: 0,
                         }}
                       />
@@ -440,8 +440,8 @@ export default function ApproachSection() {
                         }`}
                         style={{
                           transition: [
-                            `font-size ${isHovered ? '1500ms' : '300ms'} ease`,
-                            `letter-spacing ${isHovered ? '1200ms' : '250ms'} cubic-bezier(0.22, 1, 0.36, 1)`,
+                            `font-size ${isHovered ? '1000ms' : '200ms'} ease`,
+                            `letter-spacing ${isHovered ? '800ms' : '167ms'} cubic-bezier(0.22, 1, 0.36, 1)`,
                           ].join(', '),
                           letterSpacing: isHovered ? '0.06em' : '0em',
                           zIndex: 1,
@@ -457,7 +457,7 @@ export default function ApproachSection() {
                             marginTop: 4,
                             background: 'linear-gradient(90deg, transparent, #e0b07a, transparent)',
                             transform: isHovered ? 'scaleX(1)' : 'scaleX(0)',
-                            transition: `transform ${isHovered ? '800ms' : '200ms'} cubic-bezier(0.22, 1, 0.36, 1) ${isHovered ? '600ms' : '0ms'}`,
+                            transition: `transform ${isHovered ? '533ms' : '133ms'} cubic-bezier(0.22, 1, 0.36, 1) ${isHovered ? '400ms' : '0ms'}`,
                             transformOrigin: 'center',
                           }}
                         />
@@ -472,7 +472,7 @@ export default function ApproachSection() {
                             initial={{ opacity: 0, height: 0, marginTop: 0 }}
                             animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
                             exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                            transition={{ duration: 0.27, ease: 'easeOut' }}
                           >
                             {step.description}
                           </motion.p>
@@ -486,7 +486,7 @@ export default function ApproachSection() {
                         style={{
                           backgroundColor: '#e0b07a',
                           opacity: isHovered ? 0 : 1,
-                          transition: 'opacity 400ms ease-out',
+                          transition: 'opacity 267ms ease-out',
                           zIndex: 1,
                           ...(hasEntered ? {
                             animation: `dotBlink 750ms ease-in-out ${i * 900}ms`,

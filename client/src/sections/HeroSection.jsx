@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import AnimatedHourglass from '../components/AnimatedHourglass'
 
@@ -12,6 +12,7 @@ export default function HeroSection() {
   const bgY2 = useTransform(scrollYProgress, [0, 1], [0, 100])
   const textY = useTransform(scrollYProgress, [0, 1], [0, 80])
   const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  const [learnHovered, setLearnHovered] = useState(false)
 
   return (
     <section
@@ -92,7 +93,7 @@ export default function HeroSection() {
           </motion.h1>
 
           <motion.p
-            className="text-base md:text-xl text-white/70 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light" style={{ fontFamily: "'Inter', sans-serif" }}
+            className="text-base md:text-xl text-white/70 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light lg:pl-[7.5rem]" style={{ fontFamily: "'Inter', sans-serif" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
@@ -102,14 +103,23 @@ export default function HeroSection() {
           </motion.p>
 
           <motion.div
-            className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start"
+            className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start lg:pl-[7.5rem]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.1 }}
           >
             <a
               href="#about"
-              className="inline-block px-8 py-4 min-h-[48px] bg-kron-gold text-white font-sans font-normal rounded-full hover:opacity-90 transition-opacity text-center active:scale-[0.97]"
+              className="inline-block px-8 py-4 min-h-[48px] font-sans font-normal rounded-full text-center active:scale-[0.97]"
+              style={{
+                background: learnHovered ? 'rgba(185,122,69,0.22)' : 'rgba(185,122,69,0.15)',
+                border: learnHovered ? '1px solid rgba(185,122,69,0.50)' : '1px solid rgba(185,122,69,0.35)',
+                color: '#e0b07a',
+                boxShadow: learnHovered ? '0 0 12px rgba(185,122,69,0.15)' : 'none',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={() => setLearnHovered(true)}
+              onMouseLeave={() => setLearnHovered(false)}
             >
               Learn About Us
             </a>
