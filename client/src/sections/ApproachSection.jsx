@@ -7,28 +7,32 @@ const steps = [
     title: 'Life Planning',
     description:
       'We start by understanding you — your goals, values, and what matters most. This isn\'t about numbers yet; it\'s about your life.',
+    tags: ['Goals', 'Lifestyle', 'Vision'],
   },
   {
     title: 'Strategy',
     description:
       'Based on your life plan, we develop a clear financial strategy that aligns with your objectives and risk tolerance.',
+    tags: ['Portfolio', 'Risk', 'Return'],
   },
   {
     title: 'Financial Planning',
     description:
       'We build a comprehensive financial plan covering investments, pensions, protection, tax planning, and estate planning.',
+    tags: ['Tax', 'Estate', 'Structure'],
   },
   {
     title: 'Financial Advice',
     description:
       'We provide ongoing advice and regular reviews to keep your plan on track as your life evolves and markets change.',
+    tags: ['Ongoing', 'Reviews', 'Proactive'],
   },
 ]
 
 // Spatial positions for each card (percentage-based)
 const cardPositions = [
-  { left: '12%', top: '5%' },    // Card 0 — top-left
-  { left: '62%', top: '0%' },    // Card 1 — upper-right
+  { left: '12%', top: '0%' },    // Card 0 — top-left (Life Planning — first in timeline)
+  { left: '62%', top: '10%' },   // Card 1 — upper-right (Strategy — below Life Planning)
   { left: '58%', top: '48%' },   // Card 2 — center-right
   { left: '12%', top: '58%' },   // Card 3 — bottom-left
 ]
@@ -77,7 +81,9 @@ export default function ApproachSection() {
   // Refs for dynamic SVG lines
   const containerRef = useRef(null)
   const dotRefs = useRef([])
+  const cardRefs = useRef([])
   const [lineData, setLineData] = useState([])
+  const [cardMaskData, setCardMaskData] = useState([])
 
   // Scroll-triggered entrance animation
   useEffect(() => {
@@ -125,6 +131,19 @@ export default function ApproachSection() {
       })
     }
     setLineData(data)
+
+    // Compute card bounding rects relative to container for SVG mask
+    const masks = cardRefs.current.map(el => {
+      if (!el) return null
+      const r = el.getBoundingClientRect()
+      return {
+        x: r.left - containerRect.left,
+        y: r.top - containerRect.top,
+        width: r.width,
+        height: r.height,
+      }
+    }).filter(Boolean)
+    setCardMaskData(masks)
   }, [])
 
   // Recalculate lines on hover changes, entrance, and mount
@@ -192,6 +211,23 @@ export default function ApproachSection() {
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
+                  {/* Mask that fades line opacity where cards sit on top */}
+                  <mask id="line-card-mask">
+                    <rect width="100%" height="100%" fill="white" />
+                    {cardMaskData.map((rect, i) => (
+                      <rect
+                        key={i}
+                        x={rect.x}
+                        y={rect.y}
+                        width={rect.width}
+                        height={rect.height}
+                        fill="black"
+                        fillOpacity="0.72"
+                        rx="12"
+                        style={{ filter: 'blur(18px)' }}
+                      />
+                    ))}
+                  </mask>
                   {/* Soft shadow filter to make lines feel recessed/inset */}
                   <filter id="line-shadow" x="-10%" y="-10%" width="120%" height="120%">
                     <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="shadow" />
@@ -220,6 +256,7 @@ export default function ApproachSection() {
                           opacity={hasEntered ? strand.opacity : 0.1}
                           filter="url(#line-shadow)"
                           strokeLinecap="round"
+                          mask="url(#line-card-mask)"
                           style={{ transition: 'opacity 900ms' }}
                         />
                       ))}
@@ -296,6 +333,7 @@ export default function ApproachSection() {
                   >
                     {/* Card — elevated above the connector lines */}
                     <div
+                      ref={el => { cardRefs.current[i] = el }}
                       className={`relative w-64 overflow-hidden backdrop-blur-sm border rounded-xl cursor-default
                         pt-6 px-6 ${
                           isHovered
@@ -464,58 +502,88 @@ export default function ApproachSection() {
             </div>
           </StaggerChildren>
 
-          {/* Mobile: enhanced vertical tap-to-expand timeline */}
+          {/* Mobile: accordion cards */}
           <StaggerChildren className="md:hidden" staggerDelay={0.12}>
-            <div className="relative pl-10">
-              {/* Vertical gold line */}
-              <div className="absolute left-[11px] top-0 bottom-0 w-0.5 bg-kron-gold/40" />
-
-              <div className="space-y-5">
-                {steps.map((step, idx) => (
+            <div className="space-y-3">
+              {steps.map((step, idx) => {
+                const isOpen = activeIndex === idx
+                return (
                   <motion.div
                     key={step.title}
                     variants={staggerItem}
-                    className="relative"
-                    onClick={() => setActiveIndex(activeIndex === idx ? null : idx)}
+                    className={`rounded-2xl border overflow-hidden cursor-pointer transition-all duration-350 active:scale-[0.99]
+                      ${isOpen
+                        ? 'border-kron-gold/32 shadow-lg shadow-black/30'
+                        : 'border-kron-gold/12'
+                      }`}
+                    style={{ background: isOpen ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)' }}
+                    onClick={() => setActiveIndex(isOpen ? null : idx)}
                   >
-                    {/* Step number dot */}
-                    <div className="absolute -left-10 top-5 w-6 h-6 rounded-full bg-kron-gold flex items-center justify-center z-10 ring-4 ring-kron-green">
-                      <span className="text-xs font-bold text-kron-green">{idx + 1}</span>
-                    </div>
-
-                    {/* Card — larger padding, better tap target */}
-                    <div
-                      className={`bg-white/10 backdrop-blur-sm border rounded-xl p-6 cursor-pointer
-                        min-h-[48px] transition-all duration-300 active:scale-[0.98]
-                        ${activeIndex === idx ? 'border-kron-gold/60 shadow-lg shadow-kron-gold/10' : 'border-white/20'}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-bold text-white">{step.title}</h3>
-                        <svg
-                          className={`w-4 h-4 text-kron-gold/60 shrink-0 ml-3 transition-transform duration-300 ${activeIndex === idx ? 'rotate-180' : ''}`}
-                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    {/* Header row */}
+                    <div className="flex items-center gap-4 px-5 py-5">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] tracking-[0.2em] uppercase text-kron-gold/80 mb-1 font-light">
+                          Step {String(idx + 1).padStart(2, '0')}
+                        </div>
+                        <div className="text-xl font-light text-white italic" style={{ fontFamily: 'Georgia, serif' }}>
+                          {step.title}
+                        </div>
+                      </div>
+                      {/* Chevron circle */}
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300"
+                        style={{
+                          border: isOpen ? '1px solid #B97A45' : '1px solid rgba(185,122,69,0.28)',
+                          background: isOpen ? '#B97A45' : 'transparent',
+                          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        }}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                          stroke={isOpen ? '#10312C' : '#B97A45'}
+                          strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <polyline points="6 9 12 15 18 9" />
                         </svg>
                       </div>
-
-                      <AnimatePresence>
-                        {activeIndex === idx && (
-                          <motion.p
-                            className="text-[15px] text-white/70 leading-relaxed overflow-hidden"
-                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                            animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
-                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                          >
-                            {step.description}
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
                     </div>
+
+                    {/* Body */}
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-5 pb-6 border-t border-kron-gold/12 pt-4">
+                            <div className="w-6 h-px bg-kron-gold/70 mb-3" />
+                            <p className="text-sm text-white/50 leading-relaxed font-light">
+                              {step.description}
+                            </p>
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {step.tags.map(tag => (
+                                <span
+                                  key={tag}
+                                  className="text-[10px] tracking-[0.1em] uppercase px-3 py-1 rounded-full font-light"
+                                  style={{
+                                    background: 'rgba(185,122,69,0.12)',
+                                    border: '1px solid rgba(185,122,69,0.25)',
+                                    color: '#e0b07a',
+                                  }}
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
-                ))}
-              </div>
+                )
+              })}
             </div>
           </StaggerChildren>
         </div>
